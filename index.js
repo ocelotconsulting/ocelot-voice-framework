@@ -112,28 +112,21 @@ const createHandler = ({ conversationSet, fetchSession, saveSession }) => ({
       }
     }
 
-    //First the stack gets to intercept from top to bottom
     for await (subConversation of conversationStack) {
       const oldSubConversation = currentSubConversation
-      await acceptIntent({
-        subConversation,
-        topConversation: false,
-      })
+      await acceptIntent({ subConversation, topConversation: false })
+
       if (oldSubConversation !== currentSubConversation) {
         currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
-
         ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
       }
     }
 
-    //Store who we started with
-    let oldSubConversation = currentSubConversation
-
     await acceptIntent({})
 
+    let oldSubConversation = currentSubConversation
     while (oldSubConversation !== currentSubConversation) {
       currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
-
       ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
 
       craftResponse({ subConversation: oldSubConversation })

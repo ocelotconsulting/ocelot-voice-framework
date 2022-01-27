@@ -1,3 +1,5 @@
+const { acceptIntent } = require('./util/acceptIntent')
+const { craftResponse } = require('./util/craftResponse')
 const { reactivateIfUnique } = require('./util/reactivateIfUnique')
 
 const createHandler = ({ conversationSet, fetchSession, saveSession }) => ({
@@ -120,7 +122,7 @@ const createHandler = ({ conversationSet, fetchSession, saveSession }) => ({
       if (oldSubConversation !== currentSubConversation) {
         currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
 
-        ({ currentSubConversation, conversationStack } = reactivateIfUnique(currentSubConversation, conversationStack))
+        ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
       }
     }
 
@@ -132,7 +134,7 @@ const createHandler = ({ conversationSet, fetchSession, saveSession }) => ({
     while (oldSubConversation !== currentSubConversation) {
       currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
 
-      ({ currentSubConversation, conversationStack } = reactivateIfUnique(currentSubConversation, conversationStack))
+      ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
 
       craftResponse({ subConversation: oldSubConversation })
 
@@ -172,4 +174,4 @@ const createHandler = ({ conversationSet, fetchSession, saveSession }) => ({
   },
 })
 
-module.exports = createHandler
+module.exports = { createHandler, acceptIntent, craftResponse }

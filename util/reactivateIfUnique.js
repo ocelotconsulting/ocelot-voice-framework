@@ -1,4 +1,4 @@
-const reactivateIfUnique = (currentSubConversation, conversationStack) => {
+const reactivateIfUnique = ({ currentSubConversation, conversationStack, conversationSet }) => {
   if (conversationSet[Object.keys(currentSubConversation)[0]].shouldBeUnique) {
     let index = conversationStack.flatMap(conversation => Object.keys(conversation)).indexOf(Object.keys(currentSubConversation)[0])
 

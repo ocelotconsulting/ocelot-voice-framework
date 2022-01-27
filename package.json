@@ -1,0 +1,22 @@
+{
+  "name": "ocelot-voice-framework",
+  "version": "1.0.0",
+  "description": "framework for building context aware state machines as conversations within alexa or lex",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ocelotconsulting/ocelot-voice-framework.git"
+  },
+  "author": "Ocelot Consulting",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ocelotconsulting/ocelot-voice-framework/issues"
+  },
+  "homepage": "https://github.com/ocelotconsulting/ocelot-voice-framework#readme",
+  "dependencies": {
+    "robot3": "^0.2.21"
+  }
+}

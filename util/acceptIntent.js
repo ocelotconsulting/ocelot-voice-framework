@@ -1,0 +1,97 @@
+const { createMachine, interpret, state, immediate } = require('robot3');
+
+const newMachine = (stateMap, context, initialState) => initialState ?
+  createMachine(initialState, stateMap, context) :
+  createMachine(stateMap, context);
+
+const acceptIntent = async ({
+  conversationStack,
+  currentSubConversation,
+  intent,
+  topConversation,
+  fallThrough,
+  newConversation, // not used yet
+  poppedConversation,
+  sessionAttributes,
+  stateMap,
+  initialState = {},
+  context = data => data,
+  transitionStates = [],
+  interceptCallback = data => data,
+}) => {
+  let pop = false;
+
+  if (!topConversation) {
+    return fallThrough ?
+      { conversationStack, intent, sessionAttributes, currentSubConversation } :
+      interceptCallback({ conversationStack, intent, sessionAttributes, currentSubConversation })
+  } else {
+    const subConversationType = Object.keys(currentSubConversation)[0]
+    const conversationAttributes = sessionAttributes.conversationAttributes || {}
+    const finalStates = Object.keys(stateMap).filter(state => stateMap[state].final)
+    const {
+      machineContext: previousMachineContext,
+      machineState: previousMachineState = 'fresh',
+    } = currentSubConversation[subConversationType];
+
+    const innerContext = ctx => ({
+      ...context(ctx),
+      previousMachineState: previousMachineState,
+      resuming: poppedConversation,
+      conversationAttributes,
+    })
+    const innerStateMap = {
+      ...stateMap,
+      ...stateMap.resume ? {} : {
+        resume: state(immediate(previousMachineState)),
+      },
+    }
+    const innerMachineState = poppedConversation ? 'resume' : previousMachineState
+    const assembledContext = { ...initialState, ...previousMachineContext };
+
+    const machine = newMachine(innerStateMap, innerContext, innerMachineState);
+    const service = await interpret(machine, () => {}, assembledContext);
+
+    if (!poppedConversation) {
+      await service.send({ type: 'processIntent', intent });
+    }
+
+    const {
+      machine: { current: machineState },
+      context: machineContext,
+    } = service;
+
+    currentSubConversation[subConversationType] = { ...currentSubConversation[subConversationType], machineState, machineContext };
+
+    if (conversationAttributes.resume?.wipeConversation) {
+      conversationStack = [{ engagement: {}}]
+      conversationAttributes.resume.wipeConversation = false
+      pop = true
+    } else {
+      if (finalStates.includes(machineState)) {
+        pop = true;
+      }
+
+      if (transitionStates.includes(machineState)) {
+        conversationStack.push(currentSubConversation);
+        currentSubConversation = {[machineState]: {}};
+      }
+    }
+
+    return {
+      conversationStack,
+      currentSubConversation,
+      sessionAttributes: {
+        ...sessionAttributes,
+        conversationAttributes: {
+          ...conversationAttributes,
+          ...machineContext.conversationAttributes,
+        },
+      },
+      fallThrough,
+      pop,
+    };
+  }
+}
+
+module.exports = { acceptIntent }

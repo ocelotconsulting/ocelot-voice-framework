@@ -1,5 +1,5 @@
 {
-  "name": "ocelot-voice-framework",
+  "name": "@ocelot-consulting/ocelot-voice-framework",
   "version": "1.0.0",
   "description": "framework for building context aware state machines as conversations within alexa or lex",
   "main": "index.js",
@@ -21,5 +21,6 @@
     "i18next-sprintf-postprocessor": "^0.2.2",
     "lodash": "^4.17.21",
     "robot3": "^0.2.21"
-  }
+  },
+  "devDependencies": {}
 }

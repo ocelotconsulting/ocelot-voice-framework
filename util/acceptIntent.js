@@ -4,7 +4,7 @@ const newMachine = (stateMap, context, initialState) => initialState ?
   createMachine(initialState, stateMap, context) :
   createMachine(stateMap, context);
 
-const acceptIntent = async ({
+module.exports = async ({
   conversationStack,
   currentSubConversation,
   intent,
@@ -93,5 +93,3 @@ const acceptIntent = async ({
     };
   }
 }
-
-module.exports = { acceptIntent }

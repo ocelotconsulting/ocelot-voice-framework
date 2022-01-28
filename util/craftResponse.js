@@ -1,4 +1,4 @@
-const craftResponse = ({
+module.exports = ({
   finalWords = false,
   formatContext = ctx => ctx,
   overrideResume = false,
@@ -24,5 +24,3 @@ const craftResponse = ({
     `${states.resume(context)} ${states[state](context)}` :
     states[state](context);
 }
-
-module.exports = { craftResponse }

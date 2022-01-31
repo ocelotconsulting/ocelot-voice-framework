@@ -1,7 +1,11 @@
 const { reactivateIfUnique } = require('./util/reactivateIfUnique')
 
 module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
-  canHandle: () => true,
+  canHandle: () => {
+    console.log('in canHandle', JSON.stringify({ conversationSet, fetchSession, saveSession }))
+
+    true
+  },
   handle: async handlerInput => {
     const {
       responseBuilder,

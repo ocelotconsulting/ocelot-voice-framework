@@ -4,7 +4,11 @@ const ErrorHandler = {
     console.log(`~~~~~ Error handled: ${error.message}: ${error.stack}`)
     console.log('Error handlerInput: ', JSON.stringify(handlerInput))
 
-    return 'Sorry, an error occurred. Please try again'
+    return handlerInput
+      .responseBuilder
+      .speak('Sorry, an error occurred. Please try again')
+      .withShouldEndSession(false)
+      .getResponse()
   }
 }
 

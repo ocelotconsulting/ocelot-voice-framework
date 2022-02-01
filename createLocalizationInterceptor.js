@@ -1,8 +1,9 @@
 const Dialog = require('./Dialog')
+const formatAndMerge = require('./util/formatAndMerge')
 
 module.exports = translations => ({
   process: handlerInput => {
-    const allTranslations =  formatAndMerge({
+    const allTranslations = formatAndMerge({
       [handlerInput.requestEnvelope.request.locale]: {
         translation: { ...translations },
       },

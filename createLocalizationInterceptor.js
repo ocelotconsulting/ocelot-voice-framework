@@ -1,12 +1,10 @@
 const Dialog = require('./Dialog')
 
-const LocalizationInterceptor = {
+module.exports = dialogs => ({
   process: handlerInput => {
-    const dialog = new Dialog(handlerInput.requestEnvelope.request.locale)
+    const dialog = new Dialog(handlerInput.requestEnvelope.request.locale, dialogs)
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes()
 
     requestAttributes.t = (...args) => dialog.getText(...args)
   },
-};
-
-module.exports = LocalizationInterceptor
+})

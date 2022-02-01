@@ -2,7 +2,7 @@ const { reactivateIfUnique } = require('./util/reactivateIfUnique')
 
 module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
   canHandle: () => {
-    console.log('in canHandle', JSON.stringify({ conversationSet, fetchSession, saveSession }))
+    console.log('in canHandle', JSON.stringify({ conversationSet, fetchSession, saveSession, isTheFunctionThere: typeof conversationSet.engagement.acceptIntent }))
 
     true
   },

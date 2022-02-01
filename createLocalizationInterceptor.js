@@ -1,8 +1,13 @@
 const Dialog = require('./Dialog')
 
-module.exports = dialogs => ({
+module.exports = translations => ({
   process: handlerInput => {
-    const dialog = new Dialog(handlerInput.requestEnvelope.request.locale, dialogs)
+    const allTranslations =  formatAndMerge({
+      [handlerInput.requestEnvelope.request.locale]: {
+        translation: { ...translations },
+      },
+    })
+    const dialog = new Dialog(handlerInput.requestEnvelope.request.locale, allTranslations)
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes()
 
     requestAttributes.t = (...args) => dialog.getText(...args)

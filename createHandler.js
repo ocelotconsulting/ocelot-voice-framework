@@ -115,7 +115,9 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
 
       if (oldSubConversation !== currentSubConversation) {
         currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
+        console.log('before', JSON.stringify({ currentSubConversation, conversationStack, conversationSet }))
         ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
+        console.log('after', JSON.stringify({ currentSubConversation, conversationStack, conversationSet }))
       }
     }
 

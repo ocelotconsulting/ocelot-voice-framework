@@ -21,7 +21,7 @@ const reactivateIfUnique = ({ currentSubConversation, conversationStack, convers
       console.log('third', JSON.stringify({ currentSubConversation, conversationStack, conversationSet }))
     }
   }
-
+  console.log('fourth', JSON.stringify({ currentSubConversation, conversationStack, conversationSet }))
   return { currentSubConversation, conversationStack }
 }
 

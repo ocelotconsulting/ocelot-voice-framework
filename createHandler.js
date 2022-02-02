@@ -115,18 +115,16 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
 
       if (oldSubConversation !== currentSubConversation) {
         currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
-        console.log('before', JSON.stringify({ currentSubConversation, conversationStack, conversationSet }))
-        ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
-        console.log('after', JSON.stringify({ currentSubConversation, conversationStack, conversationSet }))
+        await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
       }
     }
 
+    let oldSubConversation = currentSubConversation
     await acceptIntent({})
 
-    let oldSubConversation = currentSubConversation
     while (oldSubConversation !== currentSubConversation) {
       currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
-      ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
+      await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
 
       craftResponse({ subConversation: oldSubConversation })
 

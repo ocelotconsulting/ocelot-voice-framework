@@ -68,7 +68,6 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
     const acceptIntent = async ({
       subConversation = currentSubConversation,
       topConversation = true,
-      newConversation = false,
       poppedConversation = false,
     }) => {
       await ({
@@ -83,7 +82,6 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
         sessionAttributes,
         intent,
         topConversation,
-        newConversation,
         fallThrough,
         poppedConversation,
       }))
@@ -130,7 +128,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
 
       oldSubConversation = currentSubConversation
 
-      await acceptIntent({ newConversation: true })
+      await acceptIntent({})
     }
 
     //In case of pop, loop through as many convos as want to pop off with the current situation

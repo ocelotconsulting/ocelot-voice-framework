@@ -10,7 +10,6 @@ module.exports = async ({
   intent,
   topConversation,
   fallThrough,
-  newConversation, // not used yet
   poppedConversation,
   sessionAttributes,
   stateMap,

@@ -51,12 +51,12 @@ The key difference between this framework and a normal Alexa application are:
 
 # Documentation
 
-## `createHandler` (function)
+## [`createHandler`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/createHandler.js) (function)
 
 generates the one and only request handler you need for your application. Has one object for a parameter, keys defined below
 
 `conversationSet` (array\*) \
-json for each of your subConversations where the app's logic lives. Each conversation will be an object with a single key (the conversation\'s name) with it's own set of `acceptIntent` and `craftResponse` definitions. For example, a conversationSet with the two conversations `greeting` and `randomFact` would look like this
+json for each of your subConversations where the app's logic lives. Each conversation will be an object with a single key (the conversation\'s name) with it's own set of `acceptIntent` and `craftResponse` definitions. For example, a conversationSet with the two conversations `greeting` and `askName` would look like this
 
 ```javascript
 {
@@ -90,8 +90,8 @@ const { createHandler } = require('@ocelot-consulting/ocelot-voice-framework')
 const StateHandler = createHandler({
 	conversationSet: {
 		...require('./subConversations/engagement'),
-		...require('./subConversations/help'),
-		...require('./subConversations/timeTracking'),
+		...require('./subConversations/greeting'),
+		...require('./subConversations/askName'),
 		...require('./subConversations/resume'),
 	},
 	fetchSession: getSessionFromDynamoDb,
@@ -101,7 +101,7 @@ const StateHandler = createHandler({
 
 ---
 
-## `createLocalizationInterceptor` (function)
+## [`createLocalizationInterceptor`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/createLocalizationInterceptor.js) (function)
 
 generates a request interceptor for your application that injects all dialog options for use in your application's craftResponse calls. It has built in support for different locales
 The function takes your dialog options (in json) as the only argument
@@ -124,14 +124,14 @@ Dialog options are json objects merged together. The leaf nodes of the json tree
 
 ---
 
-## `ErrorHandler`
+## [`ErrorHandler`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/ErrorHandler.js) (object)
 
-Generic error handler that prints errors to the console and responds to the user with "Sorry, an error occurred". Can be used as your only error handler, or as a "catch all" handler when your more specific error handlers are\'nt triggered
-There are no inputs or calls like there are with createHandler and createLocalizationInterceptor - you just pass this object directly to your Alexa SkillBuilder\'s `addErrorHandlers` function on creation
+Generic error handler that prints errors to the console and responds to the user with "Sorry, an error occurred". Can be used as your only error handler, or as a "catch all" handler when your more specific error handlers are'nt triggered
+There are no inputs or calls like there are with createHandler and createLocalizationInterceptor - you just pass this object directly to your Alexa SkillBuilder's `addErrorHandlers` function on creation
 
 ---
 
-## `acceptIntent` (async func)
+## [`acceptIntent`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/util/acceptIntent.js) (async func)
 
 Utility function used in each of your sub conversations in order to process the intent and handle any necessary state changes or conversational transitions
 
@@ -155,23 +155,40 @@ Utility function used in each of your sub conversations in order to process the 
 
 ---
 
-## `craftResponse` (function)
+## [`craftResponse`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/util/craftResponse.js) (function)
 
 Utility function used in each of your sub conversations that generates the response to be spoken back to the user based one the current state of the conversation
 
-`finalWords` (boolean)
+`finalWords` (boolean) \
+this indicates that there's nothing left to say and craftResponse returns an empty string when true. this is passed internally by the state handler and should be forwarded
 
-`formatContext` (function)
+`formatContext` (function) \
+sometimes, the information alexa collects isn't in a form that allows you to repeat it back to the user. for example, when scheduling appointments, collecting a date using amazon's AMAZON.DATE slot type leaves you with an ISO code. the formatContext function allows you to modify the data that gets written to the conversation's context. code for the example above;
 
-`overrideResume` (boolean)
+```javascript
+const makeAppointment = {
+	craftResponse: ({ subConversation, dialog, finalWords }) =>
+		craftResponse({
+			formatContext: (ctx) => ({
+				...ctx,
+				date: formatDate(ctx.date),
+			}),
+		}),
+}
+```
 
-`states` (object)
+`overrideResume` (boolean) \
+when you transition from one state to another mid conversation, coming back to the previous conversation will trigger the resume state for your conversation. in cases where you don't the resume to trigger, you override it by setting overrideResume to true.
 
-`subConversation` (object)
+`states` (object) \
+key map that correlates each transitory state with the text alexa should speak to the user.
+
+`subConversation` (object) \
+the subConversation that you're generating a response for. this is provided by the framework and just needs to be passed along as you call the function
 
 ---
 
-## `slotMatcher`
+## [`slotMatcher`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/util/alexaSlotMatcher.js)
 
 Alexa-specific utility functions for slots
 
@@ -188,56 +205,66 @@ Example below is of a conversation designed to collect a user's first and last n
 
 ```javascript
 const { state, transition, guard } = require('robot3')
-const { acceptIntent, craftResponse, slotMatcher } = require('@ocelot-consulting/ocelot-voice-framework')
+const {
+	acceptIntent,
+	craftResponse,
+	slotMatcher,
+} = require('@ocelot-consulting/ocelot-voice-framework')
 
 const stateMap = {
-  fresh: state(
-    transition('processIntent', 'askFirstName')
-  )
-  askFirstName: state(
-    transition('processIntent', 'askLastName',
-      // if the user didn't successfully fill the firstName slot,
-      // don't move on to asking about last name
-      guard((ctx, { intent }) => intent.slots.firstName !== ''),
-      reduce((ctx, { intent }) => ({
-        ...ctx,
-        firstName: slotMatcher.getSlotValueId(intent.slots.firstName),
-      })),
-    ),
-    // instead, re-ask about first name
-    transition('processIntent', 'askFirstName'),
-  ),
-  askLastName: state(
-    transition('processIntent', 'thankYou',
-      guard((ctx, { intent }) => intent.slots.lastName !== ''),
-      reduce((ctx, { intent }) => ({
-        ...ctx,
-        lastName: slotMatcher.getSlotValueId(intent.slots.lastName),
-      })),
-    ),
-    transition('processIntent', 'askLastName'),
-  )
-  thankYou: state(),
+	fresh: state(transition('processIntent', 'askFirstName')),
+	askFirstName: state(
+		transition(
+			'processIntent',
+			'askLastName',
+			// if the user didn't successfully fill the firstName slot,
+			// don't move on to asking about last name
+			guard((ctx, { intent }) => intent.slots.firstName !== ''),
+			reduce((ctx, { intent }) => ({
+				...ctx,
+				firstName: slotMatcher.getSlotValueId(intent.slots.firstName),
+			}))
+		),
+		// instead, re-ask about first name
+		transition('processIntent', 'askFirstName')
+	),
+	askLastName: state(
+		transition(
+			'processIntent',
+			'thankYou',
+			guard((ctx, { intent }) => intent.slots.lastName !== ''),
+			reduce((ctx, { intent }) => ({
+				...ctx,
+				lastName: slotMatcher.getSlotValueId(intent.slots.lastName),
+			}))
+		),
+		transition('processIntent', 'askLastName')
+	),
+	thankYou: state(),
 }
 
 const askName = {
-  acceptIntent: async args => await acceptIntent({
-    ...args,
-    initialState: {
-      firstName: '',
-      lastName: '',
-    },
-    stateMap,
-    transitionStates: [ 'confirmName' ],
-  }),
-  craftResponse: ({ dialog, subConversation }) => craftResponse({
-    subConversation,
-    states: {
-      askFirstName: () => dialog('askName.askFirstName'),
-      askLastName: ({ firstName }) => dialog('askName.askLastName', { firstName })
-      thankYou: ({ firstName, lastName }) => dialog('askName.thankYou', { firstName, lastName }),
-    }
-  })
+	acceptIntent: async (args) =>
+		await acceptIntent({
+			...args,
+			initialState: {
+				firstName: '',
+				lastName: '',
+			},
+			stateMap,
+			transitionStates: ['confirmName'],
+		}),
+	craftResponse: ({ dialog, subConversation }) =>
+		craftResponse({
+			subConversation,
+			states: {
+				askFirstName: () => dialog('askName.askFirstName'),
+				askLastName: ({ firstName }) =>
+					dialog('askName.askLastName', { firstName }),
+				thankYou: ({ firstName, lastName }) =>
+					dialog('askName.thankYou', { firstName, lastName }),
+			},
+		}),
 }
 ```
 

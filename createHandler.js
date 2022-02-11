@@ -1,4 +1,6 @@
 const { reactivateIfUnique } = require('./util/reactivateIfUnique')
+const acceptIntentHelper = require('./util/acceptIntent')
+const craftResponseHelper = require('./util/craftResponse')
 
 module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
   canHandle: () => true,
@@ -84,6 +86,16 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
         topConversation,
         fallThrough,
         poppedConversation,
+        acceptIntent: async args => await acceptIntentHelper({
+          conversationStack,
+          currentSubConversation,
+          sessionAttributes,
+          intent,
+          topConversation,
+          fallThrough,
+          poppedConversation,
+          ...args,
+        })
       }))
     }
 
@@ -98,6 +110,15 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
         intent,
         sessionAttributes,
         finalWords,
+        craftResponse: args => craftResponseHelper({
+          dialog,
+          subConversation,
+          conversationStack,
+          intent,
+          sessionAttributes,
+          finalWords,
+          ...args,
+        })
       })
 
       if (whatToSay && newSpeech) {

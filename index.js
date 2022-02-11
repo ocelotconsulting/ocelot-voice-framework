@@ -1,8 +1,7 @@
 module.exports = {
   createHandler: require('./createHandler'),
   createLocalizationInterceptor: require('./createLocalizationInterceptor'),
+  BuiltIn: require('./conversation/builtin'),
   ErrorHandler: require('./ErrorHandler'),
-  acceptIntent: require('./util/acceptIntent'),
-  craftResponse: require('./util/craftResponse'),
-  slotMatcher: require('./util/alexaSlotMatcher'),
+  slotMatcher: require('./util/slotMatcher'),
 }

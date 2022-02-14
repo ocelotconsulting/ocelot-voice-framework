@@ -78,7 +78,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
         sessionAttributes,
         fallThrough,
         pop,
-      } = await conversationSet[Object.keys(subConversation)[0]].acceptIntent({
+      } = await acceptIntentHelper({
         conversationStack,
         currentSubConversation,
         sessionAttributes,
@@ -86,7 +86,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
         topConversation,
         fallThrough,
         poppedConversation,
-        acceptIntent: async args => await acceptIntentHelper({
+        ...await conversationSet[Object.keys(subConversation)[0]].acceptIntent({
           conversationStack,
           currentSubConversation,
           sessionAttributes,
@@ -94,8 +94,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
           topConversation,
           fallThrough,
           poppedConversation,
-          ...args,
-        })
+        }),
       }))
     }
 
@@ -103,22 +102,21 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
       subConversation = currentSubConversation,
       finalWords = true,
     }) => {
-      const newSpeech = conversationSet[Object.keys(subConversation)[0]].craftResponse({
+      const newSpeech = craftResponseHelper({
         dialog,
         subConversation,
         conversationStack,
         intent,
         sessionAttributes,
         finalWords,
-        craftResponse: args => craftResponseHelper({
+        ...conversationSet[Object.keys(subConversation)[0]].craftResponse({
           dialog,
           subConversation,
           conversationStack,
           intent,
           sessionAttributes,
           finalWords,
-          ...args,
-        })
+        }),
       })
 
       if (whatToSay && newSpeech) {

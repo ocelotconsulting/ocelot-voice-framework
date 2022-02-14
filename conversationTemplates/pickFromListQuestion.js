@@ -4,7 +4,7 @@ const {
   transition,
   guard,
 } = require('robot3')
-const { slotMatcher } = require('../../utils/slotMatcher')
+const getSlotValueId = require('../utils/getSlotValueId')
 
 const stateMap = {
   fresh: state(
@@ -14,8 +14,8 @@ const stateMap = {
   ),
   pickFromListQuestion: state(
     transition('processIntent', 'letterSelected',
-      guard((ctx, { intent }) => intent.name === 'PickALetterIntent' && Object.keys(ctx.itemList).includes(slotMatcher.getSlotValueId(intent.slots.letter))),
-      reduce((ctx, { intent }) => ({ ...ctx, ...ctx.setResult({selectedValue: ctx.itemList[slotMatcher.getSlotValueId(intent.slots.letter)], misunderstandingCount: ctx.misunderstandingCount, selectedLetter: intent.slots.letter})})),
+      guard((ctx, { intent }) => intent.name === 'PickALetterIntent' && Object.keys(ctx.itemList).includes(getSlotValueId(intent.slots.letter))),
+      reduce((ctx, { intent }) => ({ ...ctx, ...ctx.setResult({selectedValue: ctx.itemList[getSlotValueId(intent.slots.letter)], misunderstandingCount: ctx.misunderstandingCount, selectedLetter: intent.slots.letter})})),
     ),
     transition('processIntent', 'goBack',
       guard((ctx, { intent }) => intent.name === 'GoBackIntent')

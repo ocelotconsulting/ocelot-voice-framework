@@ -1,5 +1,5 @@
 const Dialog = require('./Dialog')
-const formatAndMerge = require('./utils/formatAndMerge')
+const formatAndMerge = require('../utils/formatAndMerge')
 
 module.exports = translations => ({
   process: handlerInput => {

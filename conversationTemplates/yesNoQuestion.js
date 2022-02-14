@@ -5,7 +5,7 @@ const {
   guard,
   immediate,
 } = require('robot3')
-const { slotMatcher } = require('../../utils/slotMatcher')
+const getSlotValueId = require('../utils/getSlotValueId')
 
 const stateMap = {
   fresh: state(
@@ -19,7 +19,7 @@ const stateMap = {
       guard(ctx => ctx.resuming && ctx.alreadyAnswered(ctx) && !ctx.answer(ctx)),
     ),
     transition('processIntent', 'yesAnswer',
-      guard((ctx, { intent }) => intent.name === 'YesNoIntent' && slotMatcher.getSlotValueId(intent.slots.yesNo) === 'yes'),
+      guard((ctx, { intent }) => intent.name === 'YesNoIntent' && getSlotValueId(intent.slots.yesNo) === 'yes'),
       reduce(ctx => ({
         ...ctx,
         conversationAttributes: {
@@ -29,7 +29,7 @@ const stateMap = {
       })),
     ),
     transition('processIntent', 'noAnswer',
-      guard((ctx, { intent }) => intent.name === 'YesNoIntent' && slotMatcher.getSlotValueId(intent.slots.yesNo) === 'no'),
+      guard((ctx, { intent }) => intent.name === 'YesNoIntent' && getSlotValueId(intent.slots.yesNo) === 'no'),
       reduce(ctx => ({
         ...ctx,
         conversationAttributes: {

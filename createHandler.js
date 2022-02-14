@@ -1,6 +1,6 @@
-const reactivateIfUnique = require('./util/reactivateIfUnique')
-const acceptIntentHelper = require('./util/acceptIntent')
-const craftResponseHelper = require('./util/craftResponse')
+const reactivateIfUnique = require('./utils/reactivateIfUnique')
+const acceptIntentHelper = require('./utils/acceptIntent')
+const craftResponseHelper = require('./utils/craftResponse')
 
 module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
   canHandle: () => true,

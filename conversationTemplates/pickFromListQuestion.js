@@ -4,7 +4,7 @@ const {
   transition,
   guard,
 } = require('robot3')
-const { slotMatcher } = require('../../util/slotMatcher')
+const { slotMatcher } = require('../../utils/slotMatcher')
 
 const stateMap = {
   fresh: state(

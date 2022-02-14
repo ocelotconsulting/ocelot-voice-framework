@@ -1,7 +1,7 @@
 const i18next = require('i18next')
 const sprintf = require('i18next-sprintf-postprocessor')
 const formatAndMerge = require('./util/formatAndMerge')
-const getVariationOfAOrAn = require('./util/getVariationOfAOrAn')
+const getVariationOfAOrAn = require('./util/getVariationOfAnOrA')
 
 module.exports = class Dialog {
   constructor(locale = 'en-US', translations = {}, options = {}) {

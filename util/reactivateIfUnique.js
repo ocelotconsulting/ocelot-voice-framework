@@ -1,4 +1,4 @@
-const reactivateIfUnique = ({ currentSubConversation, conversationStack, conversationSet }) => {
+module.exports = ({ currentSubConversation, conversationStack, conversationSet }) => {
   if (conversationSet[Object.keys(currentSubConversation)[0]].shouldBeUnique) {
     let index = conversationStack.flatMap(conversation => Object.keys(conversation)).indexOf(Object.keys(currentSubConversation)[0])
 
@@ -21,5 +21,3 @@ const reactivateIfUnique = ({ currentSubConversation, conversationStack, convers
 
   return { currentSubConversation, conversationStack }
 }
-
-module.exports = { reactivateIfUnique }

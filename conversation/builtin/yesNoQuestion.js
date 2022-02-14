@@ -46,7 +46,7 @@ const stateMap = {
   noAnswer: state(),
 }
 
-const yesNoQuestion = ({
+module.exports = ({
   alreadyAnswered = () => false,
   answer = () => false,
   questionResponse = () => '',
@@ -57,7 +57,7 @@ const yesNoQuestion = ({
   misheardResponse = () => '',
   resumeResponse = () => '',
 }) => ({
-  acceptIntent: async ({acceptIntent}) => await acceptIntent({
+  acceptIntent: () => ({
     initialState: {
       misunderstandingCount: 0,
       alreadyAnswered,
@@ -67,7 +67,7 @@ const yesNoQuestion = ({
     },
     stateMap,
   }),
-  craftResponse: ({ conversationStack, dialog, craftResponse }) => craftResponse({
+  craftResponse: ({ conversationStack, dialog }) => ({
     states: {
       yesNoQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ?
         misheardResponse(dialog, { misunderstandingCount }) :
@@ -78,5 +78,3 @@ const yesNoQuestion = ({
     },
   }),
 })
-
-module.exports = { yesNoQuestion }

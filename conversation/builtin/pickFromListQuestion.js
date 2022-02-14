@@ -31,7 +31,7 @@ const stateMap = {
   goBack: state(),
 }
 
-const pickFromListQuestion = ({
+module.exports = ({
   itemList = [],
   setResult = ({selectedLetter, misunderstandingCount}) => '',
   questionResponse = () => '',
@@ -39,7 +39,7 @@ const pickFromListQuestion = ({
   misheardResponse = () => '',
   resumeResponse = () => ''
 }) => ({
-  acceptIntent: async ({acceptIntent}) => await acceptIntent({
+  acceptIntent: () => ({
     initialState: {
       misunderstandingCount: 0,
       setResult,
@@ -47,7 +47,7 @@ const pickFromListQuestion = ({
     },
     stateMap,
   }),
-  craftResponse: ({ dialog, craftResponse }) => craftResponse({
+  craftResponse: ({ dialog }) => ({
     states: {
       pickFromListQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ? misheardResponse(dialog, {misunderstandingCount}) : questionResponse(dialog, {misunderstandingCount}),
       letterSelected: ({ misunderstandingCount, selectedLetter }) => letterSelectedResponse(dialog, {misunderstandingCount, selectedLetter}),
@@ -56,5 +56,3 @@ const pickFromListQuestion = ({
     },
   }),
 })
-
-module.exports = { pickFromListQuestion }

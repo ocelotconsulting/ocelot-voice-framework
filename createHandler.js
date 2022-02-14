@@ -1,4 +1,4 @@
-const { reactivateIfUnique } = require('./util/reactivateIfUnique')
+const reactivateIfUnique = require('./util/reactivateIfUnique')
 const acceptIntentHelper = require('./util/acceptIntent')
 const craftResponseHelper = require('./util/craftResponse')
 
@@ -86,7 +86,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
         topConversation,
         fallThrough,
         poppedConversation,
-        ...await conversationSet[Object.keys(subConversation)[0]].acceptIntent({
+        ...conversationSet[Object.keys(subConversation)[0]].acceptIntent({
           conversationStack,
           currentSubConversation,
           sessionAttributes,

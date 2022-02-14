@@ -1,7 +1,4 @@
-const { yesNoQuestion } = require('./yesNoQuestion')
-const { pickFromListQuestion } = require('./pickFromListQuestion')
-
 module.exports = {
-  yesNoQuestion,
-  pickFromListQuestion,
+  yesNoQuestion: require('./yesNoQuestion'),
+  pickFromListQuestion: require('./pickFromListQuestion'),
 }

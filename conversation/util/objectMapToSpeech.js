@@ -4,6 +4,6 @@ const objectMapToSpeech = optionsList => Object.keys(optionsList).length === 1 ?
     i < (Object.keys(optionsList).length - 1) ?
       `${Object.keys(optionsList)[i]} for ${optionsList[key]}, ` :
       `or ${Object.keys(optionsList)[i]} for ${optionsList[key]}`
-  ).join('');
+  ).join('')
 
 module.exports = { objectMapToSpeech }

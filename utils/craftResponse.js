@@ -1,19 +1,14 @@
 module.exports = ({
-  finalWords = false,
   formatContext = ctx => ctx,
   overrideResume = false,
   states,
-  subConversation,
+  currentSubConversation,
 }) => {
-  // if (finalWords) {
-  //   return ''
-  // }
-
-  const conversationType = Object.keys(subConversation)[0]
+  const conversationType = Object.keys(currentSubConversation)[0]
   const {
     machineState: state,
     machineContext: unformattedContext,
-  } = subConversation[conversationType]
+  } = currentSubConversation[conversationType]
   const context = formatContext(unformattedContext)
 
   if (!states[state]) {
@@ -22,5 +17,5 @@ module.exports = ({
 
   return context.resuming && !overrideResume ?
     `${states.resume(context)} ${states[state](context)}` :
-    states[state](context);
+    states[state](context)
 }

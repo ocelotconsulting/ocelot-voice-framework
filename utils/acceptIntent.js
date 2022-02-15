@@ -2,7 +2,7 @@ const { createMachine, interpret, state, immediate } = require('robot3');
 
 const newMachine = (stateMap, context, initialState) => initialState ?
   createMachine(initialState, stateMap, context) :
-  createMachine(stateMap, context);
+  createMachine(stateMap, context)
 
 module.exports = async ({
   conversationStack,
@@ -14,7 +14,6 @@ module.exports = async ({
   sessionAttributes,
   stateMap,
   initialState = {},
-  context = data => data,
   transitionStates = [],
   interceptCallback = data => data,
 }) => {
@@ -34,7 +33,7 @@ module.exports = async ({
     } = currentSubConversation[subConversationType];
 
     const innerContext = ctx => ({
-      ...context(ctx),
+      ...ctx,
       previousMachineState: previousMachineState,
       resuming: poppedConversation,
       conversationAttributes,
@@ -58,24 +57,22 @@ module.exports = async ({
     const {
       machine: { current: machineState },
       context: machineContext,
-    } = service;
+    } = service
 
-    currentSubConversation[subConversationType] = { ...currentSubConversation[subConversationType], machineState, machineContext };
+    currentSubConversation[subConversationType] = { ...currentSubConversation[subConversationType], machineState, machineContext }
 
-    console.log('lets see here', JSON.stringify({ finalStates, machineState }))
     if (conversationAttributes.resume?.wipeConversation) {
       conversationStack = [{ engagement: {}}]
       conversationAttributes.resume.wipeConversation = false
       pop = true
     } else {
       if (finalStates.includes(machineState)) {
-        console.log('popping...')
-        pop = true;
+        pop = true
       }
 
       if (transitionStates.includes(machineState)) {
-        conversationStack.push(currentSubConversation);
-        currentSubConversation = {[machineState]: {}};
+        conversationStack.push(currentSubConversation)
+        currentSubConversation = {[machineState]: {}}
       }
     }
 
@@ -91,6 +88,6 @@ module.exports = async ({
       },
       fallThrough,
       pop,
-    };
+    }
   }
 }

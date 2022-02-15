@@ -86,7 +86,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
         topConversation,
         fallThrough,
         poppedConversation,
-        ...conversationSet[Object.keys(subConversation)[0]].acceptIntent({
+        ...conversationSet[Object.keys(subConversation)[0]]({
           conversationStack,
           currentSubConversation,
           sessionAttributes,
@@ -103,15 +103,10 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
       finalWords = true,
     }) => {
       const newSpeech = craftResponseHelper({
-        dialog,
-        subConversation,
-        conversationStack,
-        intent,
-        sessionAttributes,
-        finalWords,
-        ...conversationSet[Object.keys(subConversation)[0]].craftResponse({
+        currentSubConversation: subConversation,
+        ...conversationSet[Object.keys(subConversation)[0]]({
           dialog,
-          subConversation,
+          currentSubConversation: subConversation,
           conversationStack,
           intent,
           sessionAttributes,
@@ -124,7 +119,6 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
       } else {
         whatToSay = newSpeech || whatToSay
       }
-      console.log('called craftResponse ', JSON.stringify({ subConversation,  }))
     }
 
     for await (subConversation of conversationStack) {
@@ -174,7 +168,6 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
       },
       userId,
     })
-    console.log('before response: ', JSON.stringify({ currentSubConversation, conversationStack }))
 
     return responseBuilder
       .speak(whatToSay)

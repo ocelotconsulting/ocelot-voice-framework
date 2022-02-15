@@ -56,25 +56,21 @@ module.exports = ({
   noResponse = () => '',
   misheardResponse = () => '',
   resumeResponse = () => '',
-}) => ({
-  acceptIntent: () => ({
-    initialState: {
-      misunderstandingCount: 0,
-      alreadyAnswered,
-      answer,
-      handleNo,
-      handleYes,
-    },
-    stateMap,
-  }),
-  craftResponse: ({ conversationStack, dialog }) => ({
-    states: {
-      yesNoQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ?
-        misheardResponse(dialog, { misunderstandingCount }) :
-        questionResponse(dialog, { misunderstandingCount, conversationStack }),
-      yesAnswer: ({ misunderstandingCount }) => yesResponse(dialog, { misunderstandingCount }),
-      noAnswer: ({ misunderstandingCount }) => noResponse(dialog, { misunderstandingCount }),
-      resume: ({ misunderstandingCount }) => resumeResponse(dialog, { misunderstandingCount }),
-    },
-  }),
+}) => ({ conversationStack, dialog }) => ({
+  initialState: {
+    misunderstandingCount: 0,
+    alreadyAnswered,
+    answer,
+    handleNo,
+    handleYes,
+  },
+  stateMap,
+  states: {
+    yesNoQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ?
+      misheardResponse(dialog, { misunderstandingCount }) :
+      questionResponse(dialog, { misunderstandingCount, conversationStack }),
+    yesAnswer: ({ misunderstandingCount }) => yesResponse(dialog, { misunderstandingCount }),
+    noAnswer: ({ misunderstandingCount }) => noResponse(dialog, { misunderstandingCount }),
+    resume: ({ misunderstandingCount }) => resumeResponse(dialog, { misunderstandingCount }),
+  },
 })

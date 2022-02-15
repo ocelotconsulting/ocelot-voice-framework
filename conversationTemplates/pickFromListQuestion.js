@@ -33,26 +33,22 @@ const stateMap = {
 
 module.exports = ({
   itemList = [],
-  setResult = ({selectedLetter, misunderstandingCount}) => '',
+  setResult = () => '',
   questionResponse = () => '',
   letterSelectedResponse = () => '',
   misheardResponse = () => '',
   resumeResponse = () => ''
-}) => ({
-  acceptIntent: () => ({
-    initialState: {
-      misunderstandingCount: 0,
-      setResult,
-      itemList,
-    },
-    stateMap,
-  }),
-  craftResponse: ({ dialog }) => ({
-    states: {
-      pickFromListQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ? misheardResponse(dialog, {misunderstandingCount}) : questionResponse(dialog, {misunderstandingCount}),
-      letterSelected: ({ misunderstandingCount, selectedLetter }) => letterSelectedResponse(dialog, {misunderstandingCount, selectedLetter}),
-      goBack: ({ misunderstandingCount }) => goBackResponse(dialog, {misunderstandingCount}),
-      resume: ({ misunderstandingCount }) => resumeResponse(dialog, {misunderstandingCount}),
-    },
-  }),
+}) => ({ dialog }) => ({
+  initialState: {
+    misunderstandingCount: 0,
+    setResult,
+    itemList,
+  },
+  stateMap,
+  states: {
+    pickFromListQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ? misheardResponse(dialog, {misunderstandingCount}) : questionResponse(dialog, {misunderstandingCount}),
+    letterSelected: ({ misunderstandingCount, selectedLetter }) => letterSelectedResponse(dialog, {misunderstandingCount, selectedLetter}),
+    goBack: ({ misunderstandingCount }) => goBackResponse(dialog, {misunderstandingCount}),
+    resume: ({ misunderstandingCount }) => resumeResponse(dialog, {misunderstandingCount}),
+  },
 })

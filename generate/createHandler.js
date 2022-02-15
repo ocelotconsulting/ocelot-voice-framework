@@ -173,6 +173,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
       },
       userId,
     })
+    console.log('before response: ', JSON.stringify({ currentSubConversation, conversationStack }))
 
     return responseBuilder
       .speak(whatToSay)

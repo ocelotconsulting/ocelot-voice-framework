@@ -62,12 +62,14 @@ module.exports = async ({
 
     currentSubConversation[subConversationType] = { ...currentSubConversation[subConversationType], machineState, machineContext };
 
+    console.log('lets see here', JSON.stringify({ finalStates, machineState }))
     if (conversationAttributes.resume?.wipeConversation) {
       conversationStack = [{ engagement: {}}]
       conversationAttributes.resume.wipeConversation = false
       pop = true
     } else {
       if (finalStates.includes(machineState)) {
+        console.log('popping...')
         pop = true;
       }
 

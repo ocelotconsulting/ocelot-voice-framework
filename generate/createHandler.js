@@ -124,6 +124,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
       } else {
         whatToSay = newSpeech || whatToSay
       }
+      console.log('called craftResponse ', JSON.stringify({ subConversation,  }))
     }
 
     for await (subConversation of conversationStack) {

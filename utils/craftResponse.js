@@ -5,9 +5,9 @@ module.exports = ({
   states,
   subConversation,
 }) => {
-  if (finalWords) {
-    return ''
-  }
+  // if (finalWords) {
+  //   return ''
+  // }
 
   const conversationType = Object.keys(subConversation)[0]
   const {

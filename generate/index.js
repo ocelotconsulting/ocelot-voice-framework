@@ -1,9 +1,12 @@
-const createHandler = require('./createHandler')
-const createLocalizationInterceptor = require('./createLocalizationInterceptor')
-const ErrorHandler = require('./ErrorHandler')
+const initialize = require('./initialize')
 
-module.exports = ({ conversationSet, fetchSession, saveSession, dialogs }) => ({
-  StateHandler: createHandler({ conversationSet, fetchSession, saveSession }),
-  DialogInterceptor: createLocalizationInterceptor(dialogs),
-  ErrorHandler,
-})
+module.exports = ({ conversationSet, fetchSession, saveSession, dialogs }) => {
+  const { StateHandler, DialogInterceptor } = initialize({ conversationSet, fetchSession, saveSession, dialogs })
+
+  return Alexa.SkillBuilders
+    .custom()
+    .addRequestHandlers(StateHandler)
+    .addRequestInterceptors(DialogInterceptor)
+    .addErrorHandlers(ErrorHandler)
+    .lambda()
+}

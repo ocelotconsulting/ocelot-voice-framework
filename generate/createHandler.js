@@ -104,6 +104,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
     }) => {
       const newSpeech = craftResponseHelper({
         currentSubConversation: subConversation,
+        dialog,
         ...conversationSet[Object.keys(subConversation)[0]]({
           dialog,
           currentSubConversation: subConversation,

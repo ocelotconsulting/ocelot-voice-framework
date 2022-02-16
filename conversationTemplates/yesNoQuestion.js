@@ -65,7 +65,7 @@ module.exports = ({
     handleYes,
   },
   stateMap,
-  states: {
+  dialogMap: {
     yesNoQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ?
       misheardResponse(dialog, { misunderstandingCount }) :
       questionResponse(dialog, { misunderstandingCount, conversationStack }),

@@ -45,7 +45,7 @@ module.exports = ({
     itemList,
   },
   stateMap,
-  states: {
+  dialogMap: {
     pickFromListQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ? misheardResponse(dialog, {misunderstandingCount}) : questionResponse(dialog, {misunderstandingCount}),
     letterSelected: ({ misunderstandingCount, selectedLetter }) => letterSelectedResponse(dialog, {misunderstandingCount, selectedLetter}),
     goBack: ({ misunderstandingCount }) => goBackResponse(dialog, {misunderstandingCount}),

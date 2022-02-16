@@ -17,12 +17,14 @@ module.exports = ({
     return ''
   }
 
-  const response = dialogMap[state] ?
-    dialogMap[state](context) :
-    dialog(`${conversationType}.${state}`, context)
-  const resumeResponse = dialogMap[state] ?
-    `${dialogMap.resume(context)} ${response}` :
-    `${dialog(`${conversationType}.resume`, context)} ${response}`
+  try {
+    const response = dialogMap[state] ? dialogMap[state](context) : dialog(`${conversationType}.${state}`, context)
 
-  return context.resuming && !overrideResume ? resumeResponse : response
+    return context.resuming && !overrideResume && dialogMap.resume(context) ?
+      `${dialogMap.resume(context)} ${response}` : response
+  } catch (err) {
+    console.error(`No dialog options specified for state '${state}'.  Either define a function for dialogMap.${state} or add ${conversationType}.${state} to your dialog options json`)
+
+    throw err
+  }
 }

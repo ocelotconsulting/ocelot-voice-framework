@@ -3,7 +3,7 @@ const ErrorHandler = require('./generate/ErrorHandler')
 const generate = require('./generate')
 
 module.exports = {
-  initialize,
+  initialize: generate,
   generate: ({ conversationSet, fetchSession, saveSession, dialogs }) => {
     const { StateHandler, DialogInterceptor } = generate({ conversationSet, fetchSession, saveSession, dialogs })
     console.log('generate: ', StateHandler, DialogInterceptor)

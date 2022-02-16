@@ -13,7 +13,7 @@ module.exports = ({
   } = currentSubConversation[conversationType]
   const context = formatContext(unformattedContext)
 
-  if (!stateMap[state].final) {
+  if (conversationType !== 'engagement' && !stateMap[state].final) {
     return ''
   }
 

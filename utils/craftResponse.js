@@ -13,6 +13,7 @@ module.exports = ({
   } = currentSubConversation[conversationType]
   const context = formatContext(unformattedContext)
 
+  console.log('temporary log', stateMap, state, stateMap[state], stateMap[state].final)
   if (conversationType !== 'engagement' && !stateMap[state].final) {
     return ''
   }

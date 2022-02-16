@@ -2,6 +2,7 @@ module.exports = ({
   formatContext = ctx => ctx,
   overrideResume = false,
   currentSubConversation,
+  stateMap,
   dialogMap = {},
   dialog,
 }) => {
@@ -11,6 +12,10 @@ module.exports = ({
     machineContext: unformattedContext,
   } = currentSubConversation[conversationType]
   const context = formatContext(unformattedContext)
+
+  if (!stateMap[state].final) {
+    return ''
+  }
 
   const response = dialogMap[state] ?
     dialogMap[state](context) :

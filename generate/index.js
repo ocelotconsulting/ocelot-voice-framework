@@ -1,4 +1,4 @@
-
+const Alexa = require('aws-sdk-core')
 const createHandler = require('./createHandler')
 const createLocalizationInterceptor = require('./createLocalizationInterceptor')
 const ErrorHandler = require('./ErrorHandler')

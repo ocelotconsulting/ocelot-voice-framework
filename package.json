@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ocelotconsulting/ocelot-voice-framework#readme",
   "dependencies": {
+    "ask-sdk-core": "^2.12.0",
     "i18next": "^21.6.10",
     "i18next-sprintf-postprocessor": "^0.2.2",
     "lodash": "^4.17.21",

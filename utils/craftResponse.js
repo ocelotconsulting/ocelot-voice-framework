@@ -1,8 +1,9 @@
 module.exports = ({
   formatContext = ctx => ctx,
   overrideResume = false,
-  states,
   currentSubConversation,
+  dialogMap = {},
+  dialog,
 }) => {
   const conversationType = Object.keys(currentSubConversation)[0]
   const {
@@ -11,11 +12,12 @@ module.exports = ({
   } = currentSubConversation[conversationType]
   const context = formatContext(unformattedContext)
 
-  if (!states[state]) {
-    return ''
-  }
+  const response = dialogMap[state] ?
+    dialogMap[state](context) :
+    dialog(`${conversationType}.${state}`, context)
+  const resumeResponse = dialogMap[state] ?
+    `${dialogMap.resume(context)} ${response}` :
+    `${dialog(`${conversationType}.resume`, context)} ${response}`
 
-  return context.resuming && !overrideResume ?
-    `${states.resume(context)} ${states[state](context)}` :
-    states[state](context)
+  return context.resuming && !overrideResume ? resumeResponse : response
 }

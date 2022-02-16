@@ -1,3 +1,4 @@
+const Alexa = require('ask-sdk-core')
 const initialize = require('./initialize')
 
 module.exports = ({ conversationSet, fetchSession, saveSession, dialogs }) => {

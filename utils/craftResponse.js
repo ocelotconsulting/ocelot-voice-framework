@@ -2,9 +2,9 @@ module.exports = ({
   formatContext = ctx => ctx,
   overrideResume = false,
   currentSubConversation,
-  stateMap,
   dialogMap = {},
   dialog,
+  transitionStates = [],
 }) => {
   const conversationType = Object.keys(currentSubConversation)[0]
   const {
@@ -13,8 +13,7 @@ module.exports = ({
   } = currentSubConversation[conversationType]
   const context = formatContext(unformattedContext)
 
-  console.log('temporary log', stateMap, state, stateMap[state], stateMap[state].final)
-  if (conversationType !== 'engagement' && !stateMap[state].final) {
+  if (transitionStates.includes(state)) {
     return ''
   }
 

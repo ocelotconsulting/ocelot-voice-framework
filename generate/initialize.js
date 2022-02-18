@@ -6,7 +6,7 @@ module.exports = ({
   conversationSet,
   fetchSession,
   saveSession,
-  dialogs,
+  dialog,
   greetingDialog,
   reEngageDialog,
 }) => ({
@@ -17,6 +17,6 @@ module.exports = ({
     greetingDialog,
     reEngageDialog,
   }),
-  DialogInterceptor: createLocalizationInterceptor(dialogs),
+  DialogInterceptor: createLocalizationInterceptor(dialog),
   ErrorHandler,
 })

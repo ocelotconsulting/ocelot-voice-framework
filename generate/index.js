@@ -5,7 +5,7 @@ module.exports = ({
   conversationSet,
   fetchSession,
   saveSession,
-  dialogs,
+  dialog,
   greetingDialog,
   reEngageDialog,
 }) => {
@@ -13,7 +13,7 @@ module.exports = ({
     conversationSet,
     fetchSession,
     saveSession,
-    dialogs,
+    dialog,
     greetingDialog,
     reEngageDialog,
   })

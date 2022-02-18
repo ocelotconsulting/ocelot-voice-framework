@@ -52,8 +52,8 @@ module.exports = ({
       return transitionMap[subConversationType]()
     },
     dialogMap: {
-      fresh: greetingDialog,
-      resume: reEngageDialog,
+      fresh: (ctx, dialog) => greetingDialog(dialog),
+      resume: (ctx, dialog) => reEngageDialog(dialog),
     },
     overrideResume: true,
   })

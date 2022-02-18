@@ -17,7 +17,7 @@ module.exports = ({
     return ''
   }
 
-  const response = dialogMap[state] ? dialogMap[state](context) : dialog(`${conversationType}.${state}`, context)
+  const response = dialogMap[state] ? dialogMap[state](context, dialog) : dialog(`${conversationType}.${state}`, context)
 
   return context.resuming && !overrideResume && dialogMap.resume(context) ?
     `${dialogMap.resume(context)} ${response}` : response

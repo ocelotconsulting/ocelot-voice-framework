@@ -27,19 +27,23 @@ module.exports = ({
       })
     })(transitions),
     transitionStates: Object.keys(transitions),
-    interceptCallback: ({ conversationStack, currentSubConversation, intent }) => Object.keys(transitions)
-      .filter(({ canInterrupt }) => canInterrupt)
-      .reduce((acc, transitionType) => ({
-        ...acc,
-        [transitionType]: intent => {
-          if (intent?.name === transitions[transitionType].intent) {
-            conversationStack.push(currentSubConversation)
-            currentSubConversation = { [transitionType]: {}}
-          }
+    interceptCallback: ({ conversationStack, currentSubConversation, intent }) => {
+      const transitionTypes = Object.keys(transitions).filter(transitionType => transitions[transitionType].canInterrupt)
 
-          return { conversationStack, currentSubConversation }
-        },
-      }, {}))[currentSubConversation[Object.keys(currentSubConversation)[0]]](intent),
+      if (transitionTypes.length) {
+        transitionTypes.reduce((acc, transitionType) => ({
+          ...acc,
+          [transitionType]: () => {
+            if (intent?.name === transitions[transitionType].intent) {
+              conversationStack.push(currentSubConversation)
+              currentSubConversation = { [transitionType]: {}}
+            }
+
+            return { conversationStack, currentSubConversation }
+          },
+        }), {})[currentSubConversation[Object.keys(currentSubConversation)[0]]]()
+      }
+    },
     dialogMap: {
       fresh: greetingDialog,
       resume: reEngageDialog,

@@ -34,7 +34,7 @@ module.exports = ({
         return {}
       }
 
-        return transitionTypes.reduce((acc, transitionType) => ({
+        return (transitionTypes.reduce((acc, transitionType) => ({
           ...acc,
           [transitionType]: () => {
             if (intent?.name === transitions[transitionType].intent) {
@@ -46,7 +46,7 @@ module.exports = ({
 
             return {}
           },
-        }), {})[currentSubConversation[Object.keys(currentSubConversation)[0]]]()
+        }), {}))[currentSubConversation[Object.keys(currentSubConversation)[0]]]()
     },
     dialogMap: {
       fresh: greetingDialog,

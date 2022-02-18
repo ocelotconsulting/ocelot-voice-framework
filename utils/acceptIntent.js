@@ -20,9 +20,13 @@ module.exports = async ({
   let pop = false;
 
   if (!topConversation) {
-    return fallThrough ?
-      { conversationStack, intent, sessionAttributes, currentSubConversation } :
-      interceptCallback({ conversationStack, intent, sessionAttributes, currentSubConversation })
+    return {
+      conversationStack,
+      intent,
+      sessionAttributes,
+      currentSubConversation,
+      ...fallThrough ? {} : interceptCallback({ conversationStack, intent, sessionAttributes, currentSubConversation }),
+    }
   } else {
     const subConversationType = Object.keys(currentSubConversation)[0]
     const conversationAttributes = sessionAttributes.conversationAttributes || {}
@@ -37,6 +41,8 @@ module.exports = async ({
       previousMachineState: previousMachineState,
       resuming: poppedConversation,
       conversationAttributes,
+      error: ctx.error || '',
+      misunderstandingCount: ctx.misunderstandingCount || 0,
     })
     const innerStateMap = {
       ...stateMap,

@@ -38,17 +38,19 @@ module.exports = ({
   letterSelectedResponse = () => '',
   misheardResponse = () => '',
   resumeResponse = () => ''
-}) => ({ dialog }) => ({
-  initialState: {
-    misunderstandingCount: 0,
-    setResult,
-    itemList,
-  },
-  stateMap,
-  dialogMap: {
-    pickFromListQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ? misheardResponse(dialog, {misunderstandingCount}) : questionResponse(dialog, {misunderstandingCount}),
-    letterSelected: ({ misunderstandingCount, selectedLetter }) => letterSelectedResponse(dialog, {misunderstandingCount, selectedLetter}),
-    goBack: ({ misunderstandingCount }) => goBackResponse(dialog, {misunderstandingCount}),
-    resume: ({ misunderstandingCount }) => resumeResponse(dialog, {misunderstandingCount}),
-  },
+}) => ({
+  handle: ({ dialog }) => ({
+    initialState: {
+      misunderstandingCount: 0,
+      setResult,
+      itemList,
+    },
+    stateMap,
+    dialogMap: {
+      pickFromListQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ? misheardResponse(dialog, {misunderstandingCount}) : questionResponse(dialog, {misunderstandingCount}),
+      letterSelected: ({ misunderstandingCount, selectedLetter }) => letterSelectedResponse(dialog, {misunderstandingCount, selectedLetter}),
+      goBack: ({ misunderstandingCount }) => goBackResponse(dialog, {misunderstandingCount}),
+      resume: ({ misunderstandingCount }) => resumeResponse(dialog, {misunderstandingCount}),
+    },
+  }),
 })

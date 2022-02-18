@@ -1,8 +1,14 @@
-const reactivateIfUnique = require('../utils/reactivateIfUnique')
 const acceptIntentHelper = require('../utils/acceptIntent')
 const craftResponseHelper = require('../utils/craftResponse')
+const generateEngagement = require('../conversationTemplates/engagement')
 
-module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
+module.exports = ({
+  conversationSet: initialConversationSet,
+  fetchSession,
+  saveSession,
+  greetingDialog,
+  reEngageDialog,
+}) => ({
   canHandle: () => true,
   handle: async handlerInput => {
     const {
@@ -31,6 +37,12 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
     const setSession = saveSession || setSessionAttributes
     let sessionAttributes = await getSession(userId)
     const { t: dialog } = getRequestAttributes()
+
+    const transitions = Object.keys(initialConversationSet)
+      .filter(key => initialConversationSet[key].intent)
+      .reduce((acc, key) => ({ ...acc, [key]: initialConversationSet[key] }), {})
+    const engagement = generateEngagement({ transitions, greetingDialog, reEngageDialog })
+    const conversationSet = { engagement, ...initialConversationSet }
 
     if (requestType === 'LaunchRequest') {
       const previouslyWasEngagement = sessionAttributes.state && Object.keys(sessionAttributes.state.currentSubConversation)[0] === 'engagement'
@@ -86,7 +98,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
         topConversation,
         fallThrough,
         poppedConversation,
-        ...conversationSet[Object.keys(subConversation)[0]]({
+        ...conversationSet[Object.keys(subConversation)[0]].handle({
           conversationStack,
           currentSubConversation,
           sessionAttributes,
@@ -105,7 +117,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
       const newSpeech = craftResponseHelper({
         currentSubConversation: subConversation,
         dialog,
-        ...conversationSet[Object.keys(subConversation)[0]]({
+        ...conversationSet[Object.keys(subConversation)[0]].handle({
           dialog,
           currentSubConversation: subConversation,
           conversationStack,
@@ -128,7 +140,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
 
       if (oldSubConversation !== currentSubConversation) {
         currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
-        await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
+        // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
       }
     }
 
@@ -137,7 +149,7 @@ module.exports = ({ conversationSet, fetchSession, saveSession }) => ({
 
     while (oldSubConversation !== currentSubConversation) {
       currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
-      await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
+      // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
 
       craftResponse({ subConversation: oldSubConversation })
 

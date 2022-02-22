@@ -6,6 +6,7 @@ module.exports = ({
   dialog,
   transitionStates = [],
 }) => {
+  const transitions = typeof transitionStates === 'string' ? [ transitionStates ] : transitionStates
   const conversationType = Object.keys(currentSubConversation)[0]
   const {
     machineState: state,
@@ -13,7 +14,7 @@ module.exports = ({
   } = currentSubConversation[conversationType]
   const context = formatContext(unformattedContext)
 
-  if (transitionStates.includes(state)) {
+  if (transitions.includes(state)) {
     return ''
   }
 

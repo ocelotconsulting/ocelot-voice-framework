@@ -30,7 +30,7 @@ module.exports = async ({
   let pop = false
   const subConversationType = Object.keys(currentSubConversation)[0]
   const conversationAttributes = sessionAttributes.conversationAttributes || {}
-  const transitions = typeof transitionStates === 'string' ? [ transitionStates ] : []
+  const transitions = typeof transitionStates === 'string' ? [ transitionStates ] : transitionStates
   const finalStates = Object.keys(stateMap).filter(state => stateMap[state].final)
   const {
     machineContext: previousMachineContext,
@@ -82,8 +82,6 @@ module.exports = async ({
       currentSubConversation = {[machineState]: {}}
     }
   }
-
-  console.log('end of accept intent', JSON.stringify({ conversationStack, currentSubConversation }))
 
   return {
     conversationStack,

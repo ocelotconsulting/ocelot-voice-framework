@@ -30,29 +30,19 @@ module.exports = ({
       })
     })(generateTransitions(conversationSet)),
     transitionStates: Object.keys(generateTransitions(conversationSet)),
-    interceptCallback: ({ conversationStack, currentSubConversation, subConversation, intent }) => {
+    interceptCallback: ({ conversationStack, currentSubConversation, intent }) => {
       const transitions = generateTransitions(conversationSet)
       const transitionTypes = Object.keys(transitions).filter(transitionType => transitions[transitionType].canInterrupt)
       const conversationToTransition = Object.keys(transitions).find(transitionType => transitions[transitionType].intent === intent?.name)
 
-      console.log('in the interceptor', JSON.stringify({ transitions, transitionTypes, conversationToTransition }))
-
-      if (!transitionTypes.length || !transitionTypes.includes(conversationToTransition) || !conversationToTransition) {
-        return {}
-      }
-
-      const transitionMap = transitionTypes.reduce((acc, transitionType) => ({
+      return !transitionTypes.length || !transitionTypes.includes(conversationToTransition) || !conversationToTransition ?
+       {} : transitionTypes.reduce((acc, transitionType) => ({
         ...acc,
         [transitionType]: () => ({
           conversationStack: [ ...conversationStack, currentSubConversation ],
           currentSubConversation: { [transitionType]: {}},
         })
-      }), {})
-
-      const toReturn = transitionMap[conversationToTransition]()
-      console.log('deeeebug', JSON.stringify({ transitions, transitionTypes, transitionMap, toReturn }))
-
-      return transitionMap[conversationToTransition]()
+      }), {})[conversationToTransition]()
     },
     dialogMap: {
       fresh: (ctx, dialog) => greetingDialog(dialog),

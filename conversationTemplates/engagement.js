@@ -49,6 +49,9 @@ module.exports = ({
         },
       }), {})
 
+      const toReturn = transitionMap[subConversationType]()
+      console.log('deeeebug', JSON.stringify({ transitions, transitionTypes, transitionMap, toReturn }))
+
       return transitionMap[subConversationType]()
     },
     dialogMap: {

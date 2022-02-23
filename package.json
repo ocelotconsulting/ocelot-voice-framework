@@ -1,6 +1,6 @@
 {
   "name": "@ocelot-consulting/ocelot-voice-framework",
-  "version": "1.1.64",
+  "version": "1.1.65",
   "description": "framework for building context aware state machines as conversations within alexa or lex",
   "main": "index.js",
   "scripts": {

@@ -18,8 +18,15 @@ module.exports = async ({
 }) => {
   const subConversationType = Object.keys(subConversation)[0]
   const currentSubConversationType = Object.keys(currentSubConversation)[0]
-  console.log('in the intent accepter', JSON.stringify({ subConversation, currentSubConversation, subConversationType, currentSubConversationType, notEquals: subConversationType === currentSubConversationType }))
+
   if (subConversationType !== currentSubConversationType) {
+    console.log('yep if check working', JSON.stringify(interceptCallback({
+        conversationStack,
+        currentSubConversation,
+        subConversation,
+        intent,
+        sessionAttributes,
+      })))
     return {
       conversationStack,
       intent,

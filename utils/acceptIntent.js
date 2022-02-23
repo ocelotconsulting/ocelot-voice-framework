@@ -92,7 +92,6 @@ module.exports = async ({
         ...machineContext.conversationAttributes,
       },
     },
-    fallThrough,
     pop,
   }
 }

@@ -57,7 +57,7 @@ module.exports = ({
   misheardResponse = () => '',
   resumeResponse = () => '',
 }) => ({
-  handle: ({ conversationStack, dialog }) => ({
+  handle: ({ conversationSet, conversationStack, dialog }) => ({
     initialState: {
       misunderstandingCount: 0,
       alreadyAnswered,
@@ -68,11 +68,11 @@ module.exports = ({
     stateMap,
     dialogMap: {
       yesNoQuestion: ({ misunderstandingCount }) => misunderstandingCount > 0 ?
-        misheardResponse(dialog, { misunderstandingCount }) :
-        questionResponse(dialog, { misunderstandingCount, conversationStack }),
-      yesAnswer: ({ misunderstandingCount }) => yesResponse(dialog, { misunderstandingCount }),
-      noAnswer: ({ misunderstandingCount }) => noResponse(dialog, { misunderstandingCount }),
-      resume: ({ misunderstandingCount }) => resumeResponse(dialog, { misunderstandingCount }),
+        misheardResponse(dialog, { misunderstandingCount, conversationSet, conversationStack }) :
+        questionResponse(dialog, { misunderstandingCount, conversationSet, conversationStack }),
+      yesAnswer: ({ misunderstandingCount }) => yesResponse(dialog, { misunderstandingCount, conversationSet, conversationStack }),
+      noAnswer: ({ misunderstandingCount }) => noResponse(dialog, { misunderstandingCount, conversationSet, conversationStack }),
+      resume: ({ misunderstandingCount }) => resumeResponse(dialog, { misunderstandingCount, conversationSet, conversationStack }),
     },
   }),
 })

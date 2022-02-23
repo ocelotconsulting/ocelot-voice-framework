@@ -16,6 +16,7 @@ module.exports = async ({
   transitionStates = [],
   interceptCallback = data => data,
 }) => {
+  console.log('in accept intent', JSON.stringify({ currentSubConversation, conversationStack, topConversation }))
   if (!topConversation) {
     return {
       conversationStack,

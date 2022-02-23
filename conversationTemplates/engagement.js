@@ -31,10 +31,10 @@ module.exports = ({
     })(generateTransitions(conversationSet)),
     transitionStates: Object.keys(generateTransitions(conversationSet)),
     interceptCallback: ({ conversationStack, currentSubConversation, subConversation, intent }) => {
-      console.log('in the interceptor', JSON.stringify({ conversationStack, currentSubConversation, subConversation, intent }))
       const transitions = generateTransitions(conversationSet)
-      const subConversationType = subConversation[Object.keys(subConversation)[0]]
       const transitionTypes = Object.keys(transitions).filter(transitionType => transitions[transitionType].canInterrupt)
+      const subConversationType = subConversation[Object.keys(subConversation)[0]]
+      console.log('in the interceptor', JSON.stringify({ transitions, transitionTypes, subConversationType }))
 
       if (!transitionTypes.length || !transitionTypes.includes(subConversationType)) {
         return {}

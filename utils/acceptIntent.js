@@ -20,13 +20,6 @@ module.exports = async ({
   const currentSubConversationType = Object.keys(currentSubConversation)[0]
 
   if (subConversationType !== currentSubConversationType) {
-    console.log('yep if check working', JSON.stringify(interceptCallback({
-        conversationStack,
-        currentSubConversation,
-        subConversation,
-        intent,
-        sessionAttributes,
-      })))
     return {
       conversationStack,
       intent,

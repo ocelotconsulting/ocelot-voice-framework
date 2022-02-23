@@ -31,6 +31,7 @@ module.exports = ({
     })(generateTransitions(conversationSet)),
     transitionStates: Object.keys(generateTransitions(conversationSet)),
     interceptCallback: ({ conversationStack, currentSubConversation, subConversation, intent }) => {
+      const transitions = generateTransitions(conversationSet)
       const subConversationType = subConversation[Object.keys(subConversation)[0]]
       const transitionTypes = Object.keys(transitions).filter(transitionType => transitions[transitionType].canInterrupt)
 

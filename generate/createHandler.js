@@ -96,6 +96,7 @@ module.exports = ({
         intent,
         poppedConversation,
         ...conversationSet[Object.keys(subConversation)[0]].handle({
+          conversationSet,
           conversationStack,
           currentSubConversation,
           subConversation,
@@ -114,6 +115,7 @@ module.exports = ({
         currentSubConversation: subConversation,
         dialog,
         ...conversationSet[Object.keys(subConversation)[0]].handle({
+          conversationSet,
           dialog,
           currentSubConversation: subConversation,
           conversationStack,
@@ -131,20 +133,20 @@ module.exports = ({
     }
 
     for await (subConversation of conversationStack) {
-      const oldSubConversation = currentSubConversation
+      // const oldSubConversation = currentSubConversation
       await acceptIntent({ subConversation })
 
-      if (oldSubConversation !== currentSubConversation) {
-        currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
+      // if (oldSubConversation !== currentSubConversation) {
+        // currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
         // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
-      }
+      // }
     }
 
     let oldSubConversation = currentSubConversation
     await acceptIntent({})
 
     while (oldSubConversation !== currentSubConversation) {
-      currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
+      // currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
       // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
 
       craftResponse({ subConversation: oldSubConversation })
@@ -154,7 +156,6 @@ module.exports = ({
       await acceptIntent({})
     }
 
-    //In case of pop, loop through as many convos as want to pop off with the current situation
     while (pop && conversationStack.length > 0) {
       craftResponse({})
 

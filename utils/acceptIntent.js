@@ -83,6 +83,8 @@ module.exports = async ({
     }
   }
 
+  console.log('end of accept intent', JSON.stringify({ conversationStack, currentSubConversation }))
+
   return {
     conversationStack,
     currentSubConversation,

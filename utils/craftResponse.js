@@ -19,6 +19,7 @@ module.exports = ({
   }
 
   const response = dialogMap[state] ? dialogMap[state](context, dialog) : dialog(`${conversationType}.${state}`, context)
+  console.log('end of craft response', JSON.stringify({ response, dialogMap, conversationType, state }))
 
   return context.resuming && !overrideResume && dialogMap.resume(context) ?
     `${dialogMap.resume(context)} ${response}` : response

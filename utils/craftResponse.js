@@ -14,7 +14,7 @@ module.exports = ({
   } = currentSubConversation[conversationType]
   const context = formatContext(unformattedContext)
 
-  if (transitions.includes(state)) {
+  if (!state || transitions.includes(state)) {
     return ''
   }
 

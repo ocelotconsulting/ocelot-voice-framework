@@ -18,7 +18,7 @@ module.exports = async ({
 }) => {
   const subConversationType = Object.keys(subConversation)[0]
   const currentSubConversationType = Object.keys(currentSubConversation)[0]
-  if (subConversationType !== currentSubConversation) {
+  if (subConversationType !== currentSubConversationType) {
     return {
       conversationStack,
       intent,

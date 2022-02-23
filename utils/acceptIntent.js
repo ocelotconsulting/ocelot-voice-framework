@@ -24,7 +24,13 @@ module.exports = async ({
       intent,
       sessionAttributes,
       currentSubConversation,
-      ...interceptCallback({ conversationStack, intent, sessionAttributes, subConversation }),
+      ...interceptCallback({
+        conversationStack,
+        currentSubConversation,
+        intent,
+        sessionAttributes,
+        subConversation,
+      }),
     }
   }
 

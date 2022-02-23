@@ -38,10 +38,11 @@ module.exports = ({
     let sessionAttributes = await getSession(userId)
     const { t: dialog } = getRequestAttributes()
 
-    const transitions = Object.keys(initialConversationSet)
-      .filter(key => initialConversationSet[key].intent)
-      .reduce((acc, key) => ({ ...acc, [key]: initialConversationSet[key] }), {})
-    const engagement = generateEngagement({ transitions, greetingDialog, reEngageDialog })
+    const engagement = generateEngagement({
+      conversationSet: initialConversationSet,
+      greetingDialog,
+      reEngageDialog,
+    })
     const conversationSet = { engagement, ...initialConversationSet }
 
     if (requestType === 'LaunchRequest') {

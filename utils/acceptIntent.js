@@ -7,8 +7,8 @@ const newMachine = (stateMap, context, initialState) => initialState ?
 module.exports = async ({
   conversationStack,
   currentSubConversation,
+  subConversation,
   intent,
-  topConversation,
   poppedConversation,
   sessionAttributes,
   stateMap,
@@ -16,26 +16,26 @@ module.exports = async ({
   transitionStates = [],
   interceptCallback = data => data,
 }) => {
-  console.log('in accept intent', JSON.stringify({ currentSubConversation, conversationStack, topConversation }))
-  if (!topConversation) {
+  const subConversationType = Object.keys(subConversation)[0]
+  const currentSubConversationType = Object.keys(currentSubConversation)[0]
+  if (subConversationType === currentSubConversation) {
     return {
       conversationStack,
       intent,
       sessionAttributes,
       currentSubConversation,
-      ...interceptCallback({ conversationStack, intent, sessionAttributes, currentSubConversation }),
+      ...interceptCallback({ conversationStack, intent, sessionAttributes, subConversation }),
     }
   }
 
   let pop = false
-  const subConversationType = Object.keys(currentSubConversation)[0]
   const conversationAttributes = sessionAttributes.conversationAttributes || {}
   const transitions = typeof transitionStates === 'string' ? [ transitionStates ] : transitionStates
   const finalStates = Object.keys(stateMap).filter(state => stateMap[state].final)
   const {
     machineContext: previousMachineContext,
     machineState: previousMachineState = 'fresh',
-  } = currentSubConversation[subConversationType];
+  } = currentSubConversation[currentSubConversationType];
 
   const innerContext = ctx => ({
     ...ctx,
@@ -66,7 +66,7 @@ module.exports = async ({
     context: machineContext,
   } = service
 
-  currentSubConversation[subConversationType] = { ...currentSubConversation[subConversationType], machineState, machineContext }
+  currentSubConversation[currentSubConversationType] = { ...currentSubConversation[currentSubConversationType], machineState, machineContext }
 
   if (conversationAttributes.resume?.wipeConversation) {
     conversationStack = [{ engagement: {}}]

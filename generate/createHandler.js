@@ -80,7 +80,6 @@ module.exports = ({
 
     const acceptIntent = async ({
       subConversation = currentSubConversation,
-      topConversation = true,
       poppedConversation = false,
     }) => {
       await ({
@@ -91,16 +90,16 @@ module.exports = ({
       } = await acceptIntentHelper({
         conversationStack,
         currentSubConversation,
+        subConversation,
         sessionAttributes,
         intent,
-        topConversation,
         poppedConversation,
         ...conversationSet[Object.keys(subConversation)[0]].handle({
           conversationStack,
           currentSubConversation,
+          subConversation,
           sessionAttributes,
           intent,
-          topConversation,
           poppedConversation,
         }),
       }))
@@ -132,7 +131,7 @@ module.exports = ({
 
     for await (subConversation of conversationStack) {
       const oldSubConversation = currentSubConversation
-      await acceptIntent({ subConversation, topConversation: false })
+      await acceptIntent({ subConversation })
 
       if (oldSubConversation !== currentSubConversation) {
         currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]

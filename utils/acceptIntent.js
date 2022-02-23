@@ -9,7 +9,6 @@ module.exports = async ({
   currentSubConversation,
   intent,
   topConversation,
-  fallThrough,
   poppedConversation,
   sessionAttributes,
   stateMap,
@@ -23,7 +22,7 @@ module.exports = async ({
       intent,
       sessionAttributes,
       currentSubConversation,
-      ...fallThrough ? {} : interceptCallback({ conversationStack, intent, sessionAttributes, currentSubConversation }),
+      ...interceptCallback({ conversationStack, intent, sessionAttributes, currentSubConversation }),
     }
   }
 

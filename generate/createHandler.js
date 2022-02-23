@@ -75,7 +75,7 @@ module.exports = ({
       },
     } = sessionAttributes
 
-    let fallThrough = false
+    // let fallThrough = false
     let pop = false
     let whatToSay = ''
 
@@ -88,7 +88,7 @@ module.exports = ({
         conversationStack,
         currentSubConversation,
         sessionAttributes,
-        fallThrough,
+        // fallThrough,
         pop,
       } = await acceptIntentHelper({
         conversationStack,
@@ -96,7 +96,7 @@ module.exports = ({
         sessionAttributes,
         intent,
         topConversation,
-        fallThrough,
+        // fallThrough,
         poppedConversation,
         ...conversationSet[Object.keys(subConversation)[0]].handle({
           conversationStack,
@@ -104,7 +104,7 @@ module.exports = ({
           sessionAttributes,
           intent,
           topConversation,
-          fallThrough,
+          // fallThrough,
           poppedConversation,
         }),
       }))

@@ -6,7 +6,7 @@ module.exports = translations => ({
   process: handlerInput => {
     const allTranslations = formatAndMerge({
       [handlerInput.requestEnvelope.request.locale]: {
-        translation: { home: generateHomeDialog(translations.home), ...translations },
+        translation: { ...translations, home: generateHomeDialog(translations.home) },
       },
     })
     console.log('allTranslations', JSON.stringify(allTranslations))

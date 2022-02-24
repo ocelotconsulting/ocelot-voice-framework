@@ -1,7 +1,6 @@
 const createHandler = require('./createHandler')
 const createLocalizationInterceptor = require('./createLocalizationInterceptor')
 const ErrorHandler = require('./ErrorHandler')
-const defaultDialog = require('../dialog/home')
 
 module.exports = ({
   conversationSet,
@@ -14,6 +13,6 @@ module.exports = ({
     fetchSession,
     saveSession,
   }),
-  DialogInterceptor: createLocalizationInterceptor({ ...defaultDialog, ...dialog }),
+  DialogInterceptor: createLocalizationInterceptor(dialog),
   ErrorHandler,
 })

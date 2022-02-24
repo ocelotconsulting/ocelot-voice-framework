@@ -4,11 +4,7 @@ const generateTransitions = conversationSet => Object.entries(conversationSet)
   .filter(([, value ]) => value.intent)
   .reduce((acc, [ key, value ]) => ({ ...acc, [key]: value }), {})
 
-module.exports = ({
-  conversationSet = {},
-  greetingDialog = () => 'Hi.  Welcome to Ocelot Voice Framework.',
-  reEngageDialog = () => 'How else can I help you?',
-}) => ({
+module.exports = ({ conversationSet = {}}) => ({
   handle: () => ({
     stateMap: (transitionsMap => {
       const transitionStates = state(
@@ -45,8 +41,8 @@ module.exports = ({
       }), {})[conversationToTransition]()
     },
     dialogMap: {
-      fresh: (ctx, dialog) => greetingDialog(dialog),
-      resume: (ctx, dialog) => reEngageDialog(dialog),
+      fresh: (ctx, dialog) => `${dialog('home.welcome')} ${dialog('home.engage')}`,
+      resume: (ctx, dialog) => dialog('home.reEngage'),
     },
     overrideResume: true,
   })

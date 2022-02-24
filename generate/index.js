@@ -6,16 +6,12 @@ module.exports = ({
   fetchSession,
   saveSession,
   dialog,
-  greetingDialog,
-  reEngageDialog,
 }) => {
   const { StateHandler, DialogInterceptor, ErrorHandler } = initialize({
     conversationSet,
     fetchSession,
     saveSession,
     dialog,
-    greetingDialog,
-    reEngageDialog,
   })
 
   return Alexa.SkillBuilders

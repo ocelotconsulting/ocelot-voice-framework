@@ -76,7 +76,7 @@ module.exports = async ({
   currentSubConversation[currentSubConversationType] = { ...currentSubConversation[currentSubConversationType], machineState, machineContext }
 
   if (conversationAttributes.resume?.wipeConversation) {
-    conversationStack = [{ engagement: {}}]
+    conversationStack = [{ home: {}}]
     conversationAttributes.resume.wipeConversation = false
     pop = true
   } else {

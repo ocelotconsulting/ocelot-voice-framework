@@ -1,13 +1,13 @@
 const acceptIntentHelper = require('../utils/acceptIntent')
 const craftResponseHelper = require('../utils/craftResponse')
-const generateEngagement = require('../conversationTemplates/engagement')
+const generateHome = require('../conversationTemplates/home')
+const resume = require('../conversationTemplates/resume')
+const forgot = require('../conversationTemplates/forgot')
 
 module.exports = ({
   conversationSet: initialConversationSet,
   fetchSession,
   saveSession,
-  greetingDialog,
-  reEngageDialog,
 }) => ({
   canHandle: () => true,
   handle: async handlerInput => {
@@ -38,23 +38,24 @@ module.exports = ({
     let sessionAttributes = await getSession(userId)
     const { t: dialog } = getRequestAttributes()
 
-    const engagement = generateEngagement({
-      conversationSet: initialConversationSet,
-      greetingDialog,
-      reEngageDialog,
-    })
-    const conversationSet = { engagement, ...initialConversationSet }
+    const home = generateHome({ conversationSet: initialConversationSet })
+    const conversationSet = {
+      home,
+      resume,
+      forgot,
+      ...initialConversationSet,
+    }
 
     if (requestType === 'LaunchRequest') {
-      const previouslyWasEngagement = sessionAttributes.state && Object.keys(sessionAttributes.state.currentSubConversation)[0] === 'engagement'
+      const previouslyWasHome = sessionAttributes.state && Object.keys(sessionAttributes.state.currentSubConversation)[0] === 'home'
 
-      if (!sessionAttributes.state || previouslyWasEngagement) {
+      if (!sessionAttributes.state || previouslyWasHome) {
         sessionAttributes = {
           ...sessionAttributes,
           previousPoppedConversation: '',
           state: {
-            currentSubConversation: { engagement: {}},
-            conversationStack: previouslyWasEngagement ? sessionAttributes.state.conversationStack : [],
+            currentSubConversation: { home: {}},
+            conversationStack: previouslyWasHome ? sessionAttributes.state.conversationStack : [],
           },
         }
       } else {

@@ -1,12 +1,12 @@
 const Dialog = require('./Dialog')
 const formatAndMerge = require('../utils/formatAndMerge')
-const { home } = require('../dialog/home')
+const generateHomeDialog = require('../dialog/home')
 
 module.exports = translations => ({
   process: handlerInput => {
     const allTranslations = formatAndMerge({
       [handlerInput.requestEnvelope.request.locale]: {
-        translation: { home, ...translations },
+        translation: { home: generateHomeDialog(translations.home), ...translations },
       },
     })
     console.log('allTranslations', JSON.stringify(allTranslations))

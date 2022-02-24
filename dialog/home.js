@@ -1,4 +1,4 @@
-const home = {
+module.exports = (overrides = {}) => ({
   welcome: [
     `Hi. Welcome to Ocelot Voice Framework`,
   ],
@@ -38,7 +38,6 @@ const home = {
     `We weren't talking about anything.`,
     `I can't remember either... oh well.`,
     `We're not in the middle of anything.`
-  ]
-}
-
-module.exports = { home }
+  ],
+  ...overrides,
+})

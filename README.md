@@ -8,20 +8,9 @@ Note: this framework requires the [`robot3`](https://www.npmjs.com/package/robot
 
 # Use (Alexa)
 
-This framework is used alongside Amazon's [`ask-sdk-core`](https://www.npmjs.com/package/ask-sdk-core). To get started, install this package to your alexa project. If you've never set up an Alexa project before, [start here](https://developer.amazon.com/en-US/docs/alexa/alexa-skills-kit-sdk-for-nodejs/develop-your-first-skill.html). Your application's entry point will look something like this
+This framework is used alongside Amazon's [`ask-sdk-core`](https://www.npmjs.com/package/ask-sdk-core). To get started, install this package to your alexa project. If you've never set up an Alexa project before, [start here](https://developer.amazon.com/en-US/docs/alexa/alexa-skills-kit-sdk-for-nodejs/develop-your-first-skill.html)
 
-```javascript
-const { generate } = require('@ocelot-consulting/ocelot-voice-framework')
-
-exports.handler = generate({
-  conversationSet: { ... },
-  fetchSession: () => { ... },
-  saveSession: () => { ... },
-  dialogs: { ... },
-})
-```
-
-The key difference between this framework and a normal Alexa application are:
+The key differences between this framework and a normal Alexa application are:
 
 - conversations have contextual information stored as json that can be used to influence the conversation. for example, you can keep track of how many unexpected responses you've received from a user and show longer helpful messages rather than the quick convenient responses for most users.
 
@@ -35,22 +24,22 @@ The key difference between this framework and a normal Alexa application are:
 
 # Documentation
 
-## [`createHandler`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/createHandler.js) (function)
+## [`generate`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/createHandler.js) (function)
 
-generates the one and only request handler you need for your application. Has one object for a parameter, keys defined below
+generates your alexa application using your conversationSet and dialog options
 
 `conversationSet` (array\*) \
-json for each of your subConversations where the app's logic lives. Each conversation will be an object with a single key (the conversation\'s name) with it's own set of `acceptIntent` and `craftResponse` definitions. For example, a conversationSet with the two conversations `greeting` and `askName` would look like this
+json for each of your subConversations where the app's logic lives. Each conversation will be an object with a `handle` function, and for root conversations an `intent` to match the associated intent in the interaction model. There are other options you can return, but intent and handle are the most important. A conversationSet with the two conversations `greeting` and `randomFact` would look like this
 
 ```javascript
 {
   greeting: {
-    acceptIntent: () => { ... },
-    craftResponse: () => { ... },
+    intent: 'GreetingIntent',
+    handle: () => { ... },
   },
   randomFact: {
-    acceptIntent: () => { ... },
-    craftResponse: () => { ... },
+    intent: 'RandomFactIntent',
+    handle: () => { ... },
   },
 }
 ```
@@ -62,6 +51,9 @@ asynchronous function that's called to retrieve session data for a particular us
 asynchronous function that's called at the end of each interaction with the user to save the state the session is in between invocations. If omitted, your application will use Alexa's built in session storage.
 Note: If using fetchSession, you must also use saveSession and vice versa. If one is missing, the feedback loop won\'t be complete. In this case, we\'ll use Alexa's session storage and warn you in the console that your fetch/save will be ignored until the missing function is provided.
 
+`dialog` (object) \
+a master list of all your application's dialog options
+
 ### Example
 
 ```javascript
@@ -69,95 +61,85 @@ const {
 	saveSessionToDynamoDb,
 	getSessionFromDynamoDb,
 } = require('../service/SessionAttributesService')
-const { createHandler } = require('@ocelot-consulting/ocelot-voice-framework')
+const { generate } = require('@ocelot-consulting/ocelot-voice-framework')
 
-const StateHandler = createHandler({
+exports.handler = generate({
 	conversationSet: {
-		...require('./subConversations/engagement'),
 		...require('./subConversations/greeting'),
-		...require('./subConversations/askName'),
-		...require('./subConversations/resume'),
+		...require('./subConversations/randomFact'),
 	},
-	fetchSession: getSessionFromDynamoDb,
-	saveSession: saveSessionToDynamoDb,
+  dialog: {
+    ...require('./dialog/GreetingDialog'),
+    ...require('./dialog/RandomFactDialog'),
+  },
+  fetchSession: getSessionFromDynamoDb,
+  saveSession: saveSessionToDynamoDb,
 })
 ```
-
----
-
-## [`createLocalizationInterceptor`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/createLocalizationInterceptor.js) (function)
-
-generates a request interceptor for your application that injects all dialog options for use in your application's craftResponse calls. It has built in support for different locales
-The function takes your dialog options (in json) as the only argument
-
-### Example
-
-```javascript
-const {
-	createLocalizationInterceptor,
-} = require('@ocelot-consulting/ocelot-voice-framework')
-
-const LocalizationInterceptor = createLocalizationInterceptor({
-	...require('../dialog/en-US/SupportDialog'),
-	...require('../dialog/en-US/HelpDialog'),
-	...require('../dialog/en-US/TimeTrackingDialog'),
-})
-```
-
-Dialog options are json objects merged together. The leaf nodes of the json tree are the phrases alexa speaks to the user. They're passed as an array because you can give alexa different variations of each phrase so things don't feel scripted. The localization interceptor chooses one of the options at random. There will be an example dialog object below.
-
----
-
-## [`ErrorHandler`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/ErrorHandler.js) (object)
-
-Generic error handler that prints errors to the console and responds to the user with "Sorry, an error occurred". Can be used as your only error handler, or as a "catch all" handler when your more specific error handlers are'nt triggered
-There are no inputs or calls like there are with createHandler and createLocalizationInterceptor - you just pass this object directly to your Alexa SkillBuilder's `addErrorHandlers` function on creation
 
 ---
 
 ## [`acceptIntent`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/util/acceptIntent.js) (async func)
 
-Utility function used in each of your sub conversations in order to process the intent and handle any necessary state changes or conversational transitions
+## [`handle`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/util/craftResponse.js) (function)
 
-`conversationStack` (array)
 
-`currentSubConversation` (object)
 
-`intent` (object)
 
-`topConversation` (boolean)
 
-`fallThrough` (boolean)
 
-`initialState` (object)
+The primary place for your subConversation's logic. In the handle function, each of your sub conversations have the following available parameters for you to use
 
-`context` (function)
+`conversationSet` (object) \
+contains all of your subConversations - this is the same object you passed to the generate function
 
-`transitionStates` (array)
+`conversationStack` (array) \
+array of all active subConversations in order or oldest to newest. when a subConversation triggers a new subConversation, the current subConversation is pushed into the conversationStack and replaced with the new subConversation
 
-`interceptCallback` (function)
+`sessionAttributes` (object) \
+json that exposes all of the application's state.  can be used as global state but warning; the conversation relies on some of the values. sessionAttributes.conversationAttributes is what you should use for global state in your conversation
 
----
+`intent` (object) \
+intent json from alexa with slot data
 
-## [`craftResponse`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/util/craftResponse.js) (function)
+`poppedConversation` (boolean) \
+indicates when the subConversation being processed has been popped from the stack.  This happens when a subConversation is resolved
 
-Utility function used in each of your sub conversations that generates the response to be spoken back to the user based one the current state of the conversation
+`dialog` (function) \
+function that exposes your dialog options to speak to the user
+
+`currentSubConversation` (object) \
+the subConversation that the conversation engine is currently generating a response for - the most recent subConversation
+
+`subConversation` (object) \
+the subConversation that the conversation engine is processing during the loop.  not to be confused with currentSubConversation
 
 `finalWords` (boolean) \
-this indicates that there's nothing left to say and craftResponse returns an empty string when true. this is passed internally by the state handler and should be forwarded
+indicates that there's nothing left to say and that the subConversation is over
+
+
+
+
+
+
+
+
+From your handle function, you should return the following
+
+`finalWords` (boolean) \
+indicates that there's nothing left to say and that the subConversation is over
 
 `formatContext` (function) \
-sometimes, the information alexa collects isn't in a form that allows you to repeat it back to the user. for example, when scheduling appointments, collecting a date using amazon's AMAZON.DATE slot type leaves you with an ISO code. the formatContext function allows you to modify the data that gets written to the conversation's context. code for the example above;
+sometimes, the information alexa collects isn't in a form that allows you to repeat it back to the user. for example, when scheduling appointments, collecting a date using amazon's AMAZON.DATE slot type leaves you with an ISO code. the formatContext function allows you to modify the data that gets written to the conversation's context
 
 ```javascript
 const makeAppointment = {
-	craftResponse: ({ subConversation, dialog, finalWords }) =>
-		craftResponse({
-			formatContext: (ctx) => ({
-				...ctx,
-				date: formatDate(ctx.date),
-			}),
-		}),
+  handle: () => ({
+    formatContext: ctx => ({
+      ...ctx,
+      date: formatDate(ctx.date),
+    }),
+  }),
 }
 ```
 
@@ -170,30 +152,32 @@ key map that correlates each transitory state with the text alexa should speak t
 `subConversation` (object) \
 the subConversation that you're generating a response for. this is provided by the framework and just needs to be passed along as you call the function
 
----
-
-## [`slotMatcher`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/util/alexaSlotMatcher.js)
-
-Alexa-specific utility functions for slots
-
-`slotMatches` returns true or false based on whether or not the user's response matched a slot correctly
-
-`getSlotValueId` returns the resolved value Alexa matched to the user\'s response. i.e. if the user responds with "yup" and it matches a yes/no slot, the return value would be "yes", not "yup"
-The input for both functions is the slot object from Alexa - they\'re specific to Alexa because they assume the json will be structured in the format Alexa provides.
 
 ---
+
+
+
+
+
+
+
+
+
+
 
 # Putting it all together
 
 Example below is of a conversation designed to collect a user's first and last name
 
 ```javascript
-const { state, transition, guard } = require('robot3')
 const {
-	acceptIntent,
-	craftResponse,
-	slotMatcher,
-} = require('@ocelot-consulting/ocelot-voice-framework')
+  state,
+  transition,
+  guard,
+  invoke,
+  immediate,
+} = require('robot3')
+const { utils } = require('@ocelot-consulting/ocelot-voice-framework')
 
 const stateMap = {
 	fresh: state(transition('processIntent', 'askFirstName')),
@@ -206,7 +190,7 @@ const stateMap = {
 			guard((ctx, { intent }) => intent.slots.firstName !== ''),
 			reduce((ctx, { intent }) => ({
 				...ctx,
-				firstName: slotMatcher.getSlotValueId(intent.slots.firstName),
+				firstName: utils.getSlotValueId(intent.slots.firstName),
 			}))
 		),
 		// instead, re-ask about first name
@@ -215,40 +199,37 @@ const stateMap = {
 	askLastName: state(
 		transition(
 			'processIntent',
-			'thankYou',
+			'askForConfirmation',
 			guard((ctx, { intent }) => intent.slots.lastName !== ''),
 			reduce((ctx, { intent }) => ({
 				...ctx,
-				lastName: slotMatcher.getSlotValueId(intent.slots.lastName),
+				lastName: utils.getSlotValueId(intent.slots.lastName),
 			}))
 		),
 		transition('processIntent', 'askLastName')
 	),
+  askForConfirmation: state(
+    transition('processIntent', 'thankYou',
+      guard((ctx, { intent }) => utils.getSlotValueId(intent.slots.confirmed) === 'yes',
+    ),
+    transition('processIntent', 'restart',
+      guard((ctx, { intent }) => utils.getSlotValueId(intent.slots.confirmed) === 'no'),
+    ),
+    transition('processIntent', 'askForConfirmation')
+  ),
+  restart: immediate('askFirstName'),
 	thankYou: state(),
 }
 
 const askName = {
-	acceptIntent: async (args) =>
-		await acceptIntent({
-			...args,
-			initialState: {
-				firstName: '',
-				lastName: '',
-			},
-			stateMap,
-			transitionStates: ['confirmName'],
-		}),
-	craftResponse: ({ dialog, subConversation }) =>
-		craftResponse({
-			subConversation,
-			states: {
-				askFirstName: () => dialog('askName.askFirstName'),
-				askLastName: ({ firstName }) =>
-					dialog('askName.askLastName', { firstName }),
-				thankYou: ({ firstName, lastName }) =>
-					dialog('askName.thankYou', { firstName, lastName }),
-			},
-		}),
+  intent: 'AskNameIntent',
+  handle: () => ({
+    initialState: {
+      firstName: '',
+      lastName: '',
+    },
+    stateMap,
+  })
 }
 ```
 
@@ -265,10 +246,134 @@ const askName = {
 		`Got it, {{firstName}}.  Now what about your last name?`,
 		`Great.  Can you give me your last name next, {{firstName}}?`,
 	],
+  askForConfirmation: [
+    `So your name is {{firstName}} {{lastName}}?`,
+    `Got it.  I heard your name was {{firstName}} {{lastName}}.  Is that correct?`
+  ],
+  restart: [
+    `Oops. Let's try again.`
+  ],
 	thankYou: [
 		`Thanks for your response {{firstName}} {{lastName}}.`,
 		`{{firstName}} {{lastName}} thank you for answering.`,
 		`Okay, got it {{firstName}} {{lastName}}.`,
 	],
 }
+```
+
+And finally, the json for the interaction model
+
+```json
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "ask name skill",
+      "intents": [
+        {
+          "name": "AskNameIntent",
+          "samples": [
+            "Ask my name",
+            "Ask me my name",
+            "Ask for my name"
+          ],
+          "slots": [
+            {
+              "name": "firstName",
+              "type": "AMAZON.FirstName",
+              "samples": [
+                "{firstName}"
+              ]
+            },
+            {
+              "name": "lastName",
+              "type": "AMAZON.LastName",
+              "samples": [
+                "{lastName}"
+              ]
+            },
+            {
+              "name": "confirmed",
+              "type": "yesNoType",
+              "samples": [
+                "{confirmed}"
+              ]
+            },
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "yesNoType",
+          "values": [
+            {
+              "id": "no",
+              "name": {
+                "value": "no",
+                "synonyms": [
+                  "no thanks",
+                  "nah",
+                  "negative",
+                  "incorrect",
+                  "never",
+                  "nope",
+                  "false"
+                ]
+              }
+            },
+            {
+              "id": "yes",
+              "name": {
+                "value": "yes",
+                "synonyms": [
+                  "sounds good",
+                  "yup",
+                  "yeah",
+                  "affirmative",
+                  "correct",
+                  "always",
+                  "ok",
+                  "sure",
+                  "true"
+                ]
+              }
+            }
+          ]
+        },
+      ],
+    }
+  },
+  "dialog": {
+    "intents": [
+      {
+        "name": "AskNameIntent",
+        "confirmationRequired": false,
+        "prompts": {},
+        "slots": [
+          {
+            "name": "firstName",
+            "type": "AMAZON.FirstName",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "lastName",
+            "type": "AMAZON.LastName",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          },
+          {
+            "name": "confirmed",
+            "type": "yesNoType",
+            "elicitationRequired": false,
+            "confirmationRequired": false,
+            "prompts": {}
+          }
+        ]
+      }
+    ]
+  }
+}
+
 ```

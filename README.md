@@ -79,16 +79,9 @@ exports.handler = generate({
 
 ---
 
-## [`acceptIntent`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/util/acceptIntent.js) (async func)
-
 ## [`handle`](https://github.com/ocelotconsulting/ocelot-voice-framework/blob/master/util/craftResponse.js) (function)
 
-
-
-
-
-
-The primary place for your subConversation's logic. In the handle function, each of your sub conversations have the following available parameters for you to use
+The place for your subConversation's logic. In the handle function, each of your sub conversations have the following available parameters for you to use
 
 `conversationSet` (object) \
 contains all of your subConversations - this is the same object you passed to the generate function
@@ -117,17 +110,22 @@ the subConversation that the conversation engine is processing during the loop. 
 `finalWords` (boolean) \
 indicates that there's nothing left to say and that the subConversation is over
 
-
-
-
-
-
-
-
 From your handle function, you should return the following
 
-`finalWords` (boolean) \
-indicates that there's nothing left to say and that the subConversation is over
+`stateMap` (object*) \
+The only truly required return for the handle function.  stateMap is your robot3 state machine definition.  It drives the logic for each transition from one interaction to another.
+
+`dialogMap` (object) \
+DialogMap maps the current state of your state machine to the appropriate speech to respond to the user.  This is required for any state values that don't line up with the state name used in your stateMap.  If no dialogMap key is available for the state, the framework will use `<subConversationName>.<stateName>` by default.
+
+`initialState` (object) \
+All the keys you want available in your subConversation's context.  These values are available in all of your robot3 states and dialog speech options.  Variables are initialized at the beginning of the conversation so if you want to start with a specific value, pass it; otherwise, initialize with an empty data type of your choice.
+
+`overrideResume` (boolean) \
+When you transition from one state to another mid conversation, coming back to the previous conversation will trigger the resume state for your conversation. For conversations that should be implicitly resumed whenever they're at the top of the stack, pass `overrideResume: true` to skip that step and go right back into your conversation without asking the user.
+
+`transitionStates` (array) \
+If your subConversation leads to another subConversation, pass the name of each available transition as a new string to the array.  For example, if you have a reusable `collectAddress` subConversation that some of your other subConversations rely on, you'd pass `transitionStates: [ 'collectAddress' ]` to each of the subConversations that use it.
 
 `formatContext` (function) \
 sometimes, the information alexa collects isn't in a form that allows you to repeat it back to the user. for example, when scheduling appointments, collecting a date using amazon's AMAZON.DATE slot type leaves you with an ISO code. the formatContext function allows you to modify the data that gets written to the conversation's context
@@ -143,26 +141,22 @@ const makeAppointment = {
 }
 ```
 
-`overrideResume` (boolean) \
-when you transition from one state to another mid conversation, coming back to the previous conversation will trigger the resume state for your conversation. in cases where you don't the resume to trigger, you override it by setting overrideResume to true.
-
-`states` (object) \
-key map that correlates each transitory state with the text alexa should speak to the user.
-
-`subConversation` (object) \
-the subConversation that you're generating a response for. this is provided by the framework and just needs to be passed along as you call the function
+All input values from the handle function can be modified and replaced in the return of the handle function, but do so at your own risk as it could cause bugs.
 
 
 ---
 
+## `intent` (string)
 
+The name of the intent in your interaction model that corresponds to the subConversation.  This is _only_ to be used in root subConversations, not subConversations that are accessed and used by other subConversations.
 
+---
 
+## `canInterrupt` (boolean)
 
+For subConversations that are high priority, sometimes we want to interrupt the current subConversation and come back to it later.  In this case, you pass `canInterrupt: true` back from the handle function.  After the subConversation is concluded, the previous subConversation will be popped off the stack in a `resume` state to give the user an option to continue the previous conversation or end it.
 
-
-
-
+---
 
 
 # Putting it all together
@@ -229,7 +223,7 @@ const askName = {
       lastName: '',
     },
     stateMap,
-  })
+  }),
 }
 ```
 

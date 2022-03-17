@@ -58,16 +58,16 @@ a master list of all your application's dialog options
 
 ```javascript
 const {
-	saveSessionToDynamoDb,
-	getSessionFromDynamoDb,
+ saveSessionToDynamoDb,
+ getSessionFromDynamoDb,
 } = require('../service/SessionAttributesService')
 const { generate } = require('@ocelot-consulting/ocelot-voice-framework')
 
 exports.handler = generate({
-	conversationSet: {
-		...require('./subConversations/greeting'),
-		...require('./subConversations/randomFact'),
-	},
+ conversationSet: {
+  ...require('./subConversations/greeting'),
+  ...require('./subConversations/randomFact'),
+ },
   dialog: {
     ...require('./dialog/GreetingDialog'),
     ...require('./dialog/RandomFactDialog'),
@@ -143,7 +143,6 @@ const makeAppointment = {
 
 All input values from the handle function can be modified and replaced in the return of the handle function, but do so at your own risk as it could cause bugs.
 
-
 ---
 
 ## `intent` (string)
@@ -157,7 +156,6 @@ The name of the intent in your interaction model that corresponds to the subConv
 For subConversations that are high priority, sometimes we want to interrupt the current subConversation and come back to it later.  In this case, you pass `canInterrupt: true` back from the handle function.  After the subConversation is concluded, the previous subConversation will be popped off the stack in a `resume` state to give the user an option to continue the previous conversation or end it.
 
 ---
-
 
 # Putting it all together
 
@@ -174,34 +172,34 @@ const {
 const { utils } = require('@ocelot-consulting/ocelot-voice-framework')
 
 const stateMap = {
-	fresh: state(transition('processIntent', 'askFirstName')),
-	askFirstName: state(
-		transition(
-			'processIntent',
-			'askLastName',
-			// if the user didn't successfully fill the firstName slot,
-			// don't move on to asking about last name
-			guard((ctx, { intent }) => intent.slots.firstName !== ''),
-			reduce((ctx, { intent }) => ({
-				...ctx,
-				firstName: utils.getSlotValueId(intent.slots.firstName),
-			}))
-		),
-		// instead, re-ask about first name
-		transition('processIntent', 'askFirstName')
-	),
-	askLastName: state(
-		transition(
-			'processIntent',
-			'askForConfirmation',
-			guard((ctx, { intent }) => intent.slots.lastName !== ''),
-			reduce((ctx, { intent }) => ({
-				...ctx,
-				lastName: utils.getSlotValueId(intent.slots.lastName),
-			}))
-		),
-		transition('processIntent', 'askLastName')
-	),
+ fresh: state(transition('processIntent', 'askFirstName')),
+ askFirstName: state(
+  transition(
+   'processIntent',
+   'askLastName',
+   // if the user didn't successfully fill the firstName slot,
+   // don't move on to asking about last name
+   guard((ctx, { intent }) => intent.slots.firstName !== ''),
+   reduce((ctx, { intent }) => ({
+    ...ctx,
+    firstName: utils.getSlotValueId(intent.slots.firstName),
+   }))
+  ),
+  // instead, re-ask about first name
+  transition('processIntent', 'askFirstName')
+ ),
+ askLastName: state(
+  transition(
+   'processIntent',
+   'askForConfirmation',
+   guard((ctx, { intent }) => intent.slots.lastName !== ''),
+   reduce((ctx, { intent }) => ({
+    ...ctx,
+    lastName: utils.getSlotValueId(intent.slots.lastName),
+   }))
+  ),
+  transition('processIntent', 'askLastName')
+ ),
   askForConfirmation: state(
     transition('processIntent', 'thankYou',
       guard((ctx, { intent }) => utils.getSlotValueId(intent.slots.confirmed) === 'yes',
@@ -212,7 +210,7 @@ const stateMap = {
     transition('processIntent', 'askForConfirmation')
   ),
   restart: immediate('askFirstName'),
-	thankYou: state(),
+ thankYou: state(),
 }
 
 const askName = {
@@ -231,15 +229,15 @@ And the dialog options for this conversation (pass them to `createLocalizationIn
 
 ```javascript
 const askName = {
-	askFirstName: [
-		`Hi. What is your first name?`,
-		`Hello. What's your first name?``Hey there. What is your first name?`,
-	],
-	askLastName: [
-		`Thanks {{firstName}}.  What's your last name?`,
-		`Got it, {{firstName}}.  Now what about your last name?`,
-		`Great.  Can you give me your last name next, {{firstName}}?`,
-	],
+ askFirstName: [
+  `Hi. What is your first name?`,
+  `Hello. What's your first name?``Hey there. What is your first name?`,
+ ],
+ askLastName: [
+  `Thanks {{firstName}}.  What's your last name?`,
+  `Got it, {{firstName}}.  Now what about your last name?`,
+  `Great.  Can you give me your last name next, {{firstName}}?`,
+ ],
   askForConfirmation: [
     `So your name is {{firstName}} {{lastName}}?`,
     `Got it.  I heard your name was {{firstName}} {{lastName}}.  Is that correct?`
@@ -247,11 +245,11 @@ const askName = {
   restart: [
     `Oops. Let's try again.`
   ],
-	thankYou: [
-		`Thanks for your response {{firstName}} {{lastName}}.`,
-		`{{firstName}} {{lastName}} thank you for answering.`,
-		`Okay, got it {{firstName}} {{lastName}}.`,
-	],
+ thankYou: [
+  `Thanks for your response {{firstName}} {{lastName}}.`,
+  `{{firstName}} {{lastName}} thank you for answering.`,
+  `Okay, got it {{firstName}} {{lastName}}.`,
+ ],
 }
 ```
 

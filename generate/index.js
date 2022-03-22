@@ -1,5 +1,6 @@
 const Alexa = require('ask-sdk-core')
 const initialize = require('./initialize')
+const {skillIdInterceptor} = require('./skillIdInterceptor')
 
 module.exports = ({
   conversationSet,
@@ -17,7 +18,7 @@ module.exports = ({
   return Alexa.SkillBuilders
     .custom()
     .addRequestHandlers(StateHandler)
-    .addRequestInterceptors(DialogInterceptor)
+    .addRequestInterceptors([DialogInterceptor, skillIdInterceptor])
     .addErrorHandlers(ErrorHandler)
     .lambda()
 }

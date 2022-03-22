@@ -18,7 +18,7 @@ The key differences between this framework and a normal Alexa application are:
 
 - normal alexa apps add a new request handler and intent for each conversation option - the intent is used to navigate to the correct request handler. this framework uses it's own request handler behind the scenes for every request so you don't worry about writing them. intents are used for navigating between sub conversations rather than handlers.
 
-- slots TODO
+- slots are Alexa's data types.  you create your own in the interaction model and include a reference to each slot you want to use in your intent in the intent declaration.  you can use Amazon's pre-built slot types (mentioned in docs), or build your own. slots are used in the same way with the framework, so [Alexa's documentation for slots](https://developer.amazon.com/en-US/docs/alexa/custom-skills/slot-type-reference.html) is relevant here too.
 
 ---
 

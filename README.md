@@ -225,7 +225,7 @@ const askName = {
 }
 ```
 
-And the dialog options for this conversation (pass them to `createLocalizationInterceptor` so they're available when calling `dialog`)
+And the dialog options for this conversation (passed to the `generate` function as `dialog`)
 
 ```javascript
 const askName = {

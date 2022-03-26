@@ -4,6 +4,153 @@ const generateHome = require('../conversationTemplates/home')
 const resume = require('../conversationTemplates/resume')
 const forgot = require('../conversationTemplates/forgot')
 
+const run = ({
+  setSession,
+  getSession,
+  sessionAttributes,
+  dialog,
+  conversationSet,
+}) => {
+  if (requestType === 'LaunchRequest') {
+    const previouslyWasHome = sessionAttributes.state && Object.keys(sessionAttributes.state.currentSubConversation)[0] === 'home'
+
+    if (!sessionAttributes.state || previouslyWasHome) {
+      sessionAttributes = {
+        ...sessionAttributes,
+        previousPoppedConversation: '',
+        state: {
+          currentSubConversation: { home: {}},
+          conversationStack: previouslyWasHome ? sessionAttributes.state.conversationStack : [],
+        },
+      }
+    } else {
+      sessionAttributes = {
+        ...sessionAttributes,
+        previousPoppedConversation: '',
+        state: {
+          currentSubConversation: { resume: {}},
+          conversationStack: [ ...sessionAttributes.state.conversationStack, sessionAttributes.state.currentSubConversation ]
+        },
+      }
+    }
+  }
+
+  let {
+    state: {
+      currentSubConversation,
+      conversationStack,
+    },
+  } = sessionAttributes
+
+  let pop = false
+  let whatToSay = ''
+
+  const acceptIntent = async ({
+    subConversation = currentSubConversation,
+    poppedConversation = false,
+  }) => {
+    await ({
+      conversationStack,
+      currentSubConversation,
+      sessionAttributes,
+      pop,
+    } = await acceptIntentHelper({
+      conversationStack,
+      currentSubConversation,
+      subConversation,
+      sessionAttributes,
+      intent,
+      poppedConversation,
+      ...conversationSet[Object.keys(subConversation)[0]].handle({
+        conversationSet,
+        conversationStack,
+        currentSubConversation,
+        subConversation,
+        sessionAttributes,
+        intent,
+        poppedConversation,
+      }),
+    }))
+  }
+
+  const craftResponse = ({
+    subConversation = currentSubConversation,
+    finalWords = true,
+  }) => {
+    const newSpeech = craftResponseHelper({
+      currentSubConversation: subConversation,
+      dialog,
+      ...conversationSet[Object.keys(subConversation)[0]].handle({
+        conversationSet,
+        dialog,
+        currentSubConversation: subConversation,
+        conversationStack,
+        intent,
+        sessionAttributes,
+        finalWords,
+      }),
+    })
+
+    if (whatToSay && newSpeech) {
+      whatToSay = `${whatToSay} ${newSpeech}`
+    } else {
+      whatToSay = newSpeech || whatToSay
+    }
+  }
+
+  for await (subConversation of conversationStack) {
+    // const oldSubConversation = currentSubConversation
+    await acceptIntent({ subConversation })
+
+    // if (oldSubConversation !== currentSubConversation) {
+      // currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
+      // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
+    // }
+  }
+
+  let oldSubConversation = currentSubConversation
+  await acceptIntent({})
+
+  while (oldSubConversation !== currentSubConversation) {
+    // currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
+    // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
+
+    craftResponse({ subConversation: oldSubConversation })
+
+    oldSubConversation = currentSubConversation
+
+    await acceptIntent({})
+  }
+
+  while (pop && conversationStack.length > 0) {
+    craftResponse({})
+
+    sessionAttributes = {
+      ...sessionAttributes,
+      previousPoppedConversation: Object.keys(currentSubConversation)[0],
+    }
+    currentSubConversation = conversationStack.pop()
+
+    await acceptIntent({ poppedConversation: true })
+  }
+
+  craftResponse({ finalWords: false })
+
+  await setSession({
+    ...sessionAttributes,
+    state: {
+      currentSubConversation,
+      conversationStack,
+    },
+    userId,
+  })
+
+  return responseBuilder
+    .speak(whatToSay)
+    .withShouldEndSession(false)
+    .getResponse()
+}
+
 module.exports = ({
   conversationSet: initialConversationSet,
   fetchSession,
@@ -33,9 +180,9 @@ module.exports = ({
       return responseBuilder.getResponse()
     }
 
-    const getSession = fetchSession || getSessionAttributes
     const setSession = saveSession || setSessionAttributes
-    let sessionAttributes = await getSession(userId)
+    const getSession = fetchSession || getSessionAttributes
+    const sessionAttributes = await getSession(userId)
     const { t: dialog } = getRequestAttributes()
 
     const home = generateHome({ conversationSet: initialConversationSet })
@@ -46,143 +193,31 @@ module.exports = ({
       ...initialConversationSet,
     }
 
-    if (requestType === 'LaunchRequest') {
-      const previouslyWasHome = sessionAttributes.state && Object.keys(sessionAttributes.state.currentSubConversation)[0] === 'home'
+    const args = {
+      setSession,
+      getSession,
+      sessionAttributes,
+      dialog,
+      conversationSet,
+    }
 
-      if (!sessionAttributes.state || previouslyWasHome) {
-        sessionAttributes = {
-          ...sessionAttributes,
-          previousPoppedConversation: '',
-          state: {
-            currentSubConversation: { home: {}},
-            conversationStack: previouslyWasHome ? sessionAttributes.state.conversationStack : [],
-          },
-        }
+    try {
+      run(args)
+    } catch (err) {
+      if (requestType === 'LaunchRequest') {
+        console.log('Error with loaded data: ', JSON.stringify(err))
+        console.log('Loaded data: ', JSON.stringify(sessionAttributes))
+        console.log('Starting session with fresh data...')
+
+        run({
+          ...args,
+          getSession: getSessionAttributes,
+          setSession: setSessionAttributes,
+          sessionAttributes: await getSessionAttributes(),
+        })
       } else {
-        sessionAttributes = {
-          ...sessionAttributes,
-          previousPoppedConversation: '',
-          state: {
-            currentSubConversation: { resume: {}},
-            conversationStack: [ ...sessionAttributes.state.conversationStack, sessionAttributes.state.currentSubConversation ]
-          },
-        }
+        throw err
       }
     }
-
-    let {
-      state: {
-        currentSubConversation,
-        conversationStack,
-      },
-    } = sessionAttributes
-
-    let pop = false
-    let whatToSay = ''
-
-    const acceptIntent = async ({
-      subConversation = currentSubConversation,
-      poppedConversation = false,
-    }) => {
-      await ({
-        conversationStack,
-        currentSubConversation,
-        sessionAttributes,
-        pop,
-      } = await acceptIntentHelper({
-        conversationStack,
-        currentSubConversation,
-        subConversation,
-        sessionAttributes,
-        intent,
-        poppedConversation,
-        ...conversationSet[Object.keys(subConversation)[0]].handle({
-          conversationSet,
-          conversationStack,
-          currentSubConversation,
-          subConversation,
-          sessionAttributes,
-          intent,
-          poppedConversation,
-        }),
-      }))
-    }
-
-    const craftResponse = ({
-      subConversation = currentSubConversation,
-      finalWords = true,
-    }) => {
-      const newSpeech = craftResponseHelper({
-        currentSubConversation: subConversation,
-        dialog,
-        ...conversationSet[Object.keys(subConversation)[0]].handle({
-          conversationSet,
-          dialog,
-          currentSubConversation: subConversation,
-          conversationStack,
-          intent,
-          sessionAttributes,
-          finalWords,
-        }),
-      })
-
-      if (whatToSay && newSpeech) {
-        whatToSay = `${whatToSay} ${newSpeech}`
-      } else {
-        whatToSay = newSpeech || whatToSay
-      }
-    }
-
-    for await (subConversation of conversationStack) {
-      // const oldSubConversation = currentSubConversation
-      await acceptIntent({ subConversation })
-
-      // if (oldSubConversation !== currentSubConversation) {
-        // currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
-        // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
-      // }
-    }
-
-    let oldSubConversation = currentSubConversation
-    await acceptIntent({})
-
-    while (oldSubConversation !== currentSubConversation) {
-      // currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
-      // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
-
-      craftResponse({ subConversation: oldSubConversation })
-
-      oldSubConversation = currentSubConversation
-
-      await acceptIntent({})
-    }
-
-    while (pop && conversationStack.length > 0) {
-      craftResponse({})
-
-      sessionAttributes = {
-        ...sessionAttributes,
-        previousPoppedConversation: Object.keys(currentSubConversation)[0],
-      }
-      currentSubConversation = conversationStack.pop()
-
-      await acceptIntent({ poppedConversation: true })
-    }
-
-    craftResponse({ finalWords: false })
-
-    await setSession({
-      ...sessionAttributes,
-      state: {
-        currentSubConversation,
-        conversationStack,
-      },
-      userId,
-    })
-
-    return responseBuilder
-      .speak(whatToSay)
-      .withShouldEndSession(false)
-      .getResponse()
   },
 })

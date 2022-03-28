@@ -4,12 +4,13 @@ const generateHome = require('../conversationTemplates/home')
 const resume = require('../conversationTemplates/resume')
 const forgot = require('../conversationTemplates/forgot')
 
-const run = ({
+const run = async ({
   setSession,
-  getSession,
   sessionAttributes,
   dialog,
   conversationSet,
+  responseBuilder,
+  intent,
 }) => {
   if (requestType === 'LaunchRequest') {
     const previouslyWasHome = sessionAttributes.state && Object.keys(sessionAttributes.state.currentSubConversation)[0] === 'home'
@@ -195,10 +196,11 @@ module.exports = ({
 
     const args = {
       setSession,
-      getSession,
       sessionAttributes,
       dialog,
       conversationSet,
+      responseBuilder,
+      intent,
     }
 
     try {

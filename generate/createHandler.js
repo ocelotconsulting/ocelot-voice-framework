@@ -11,6 +11,7 @@ const run = async ({
   conversationSet,
   responseBuilder,
   intent,
+  requestType,
 }) => {
   if (requestType === 'LaunchRequest') {
     const previouslyWasHome = sessionAttributes.state && Object.keys(sessionAttributes.state.currentSubConversation)[0] === 'home'
@@ -201,6 +202,7 @@ module.exports = ({
       conversationSet,
       responseBuilder,
       intent,
+      requestType,
     }
 
     try {

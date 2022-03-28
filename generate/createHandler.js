@@ -12,6 +12,7 @@ const run = async ({
   responseBuilder,
   intent,
   requestType,
+  userId,
 }) => {
   if (requestType === 'LaunchRequest') {
     const previouslyWasHome = sessionAttributes.state && Object.keys(sessionAttributes.state.currentSubConversation)[0] === 'home'
@@ -19,6 +20,7 @@ const run = async ({
     if (!sessionAttributes.state || previouslyWasHome) {
       sessionAttributes = {
         ...sessionAttributes,
+        userId,
         previousPoppedConversation: '',
         state: {
           currentSubConversation: { home: {}},
@@ -28,6 +30,7 @@ const run = async ({
     } else {
       sessionAttributes = {
         ...sessionAttributes,
+        userId,
         previousPoppedConversation: '',
         state: {
           currentSubConversation: { resume: {}},
@@ -144,7 +147,6 @@ const run = async ({
       currentSubConversation,
       conversationStack,
     },
-    userId,
   })
 
   return responseBuilder
@@ -203,6 +205,7 @@ module.exports = ({
       responseBuilder,
       intent,
       requestType,
+      userId,
     }
 
     try {

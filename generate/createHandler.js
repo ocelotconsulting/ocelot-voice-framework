@@ -209,14 +209,16 @@ module.exports = ({
     }
 
     try {
-      await run(args)
+      const result = await run(args)
+
+      return result
     } catch (err) {
       if (requestType === 'LaunchRequest') {
         console.log('Error with loaded data: ', JSON.stringify(err))
         console.log('Loaded data: ', JSON.stringify(sessionAttributes))
         console.log('Starting session with fresh data...')
 
-        await run({
+        return await run({
           ...args,
           getSession: getSessionAttributes,
           setSession: setSessionAttributes,

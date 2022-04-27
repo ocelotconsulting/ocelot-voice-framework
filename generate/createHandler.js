@@ -104,21 +104,21 @@ const run = async ({
   }
 
   for await (subConversation of conversationStack) {
-    // const oldSubConversation = currentSubConversation
+    const oldSubConversation = currentSubConversation
     await acceptIntent({ subConversation })
 
-    // if (oldSubConversation !== currentSubConversation) {
-      // currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
-      // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
-    // }
+    if (oldSubConversation !== currentSubConversation) {
+      currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(subConversation)[0]
+      await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
+    }
   }
 
   let oldSubConversation = currentSubConversation
   await acceptIntent({})
 
   while (oldSubConversation !== currentSubConversation) {
-    // currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
-    // await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
+    currentSubConversation[Object.keys(currentSubConversation)[0]].parent = Object.keys(oldSubConversation)[0]
+    await ({ currentSubConversation, conversationStack } = reactivateIfUnique({ currentSubConversation, conversationStack, conversationSet }))
 
     craftResponse({ subConversation: oldSubConversation })
 

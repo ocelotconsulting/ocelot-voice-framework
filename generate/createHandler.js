@@ -3,6 +3,7 @@ const craftResponseHelper = require('../utils/craftResponse')
 const generateHome = require('../conversationTemplates/home')
 const resume = require('../conversationTemplates/resume')
 const forgot = require('../conversationTemplates/forgot')
+const reactivateIfUnique = require('../utils/reactivateIfUnique')
 
 const run = async ({
   setSession,

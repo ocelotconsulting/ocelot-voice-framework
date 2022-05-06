@@ -15,6 +15,8 @@ module.exports = ({
     dialog,
   })
 
+  console.log('TODO delete me ', DialogInterceptor, typeof DialogInterceptor.process, skillIdInterceptor, typeof skillIdInterceptor.process)
+
   return Alexa.SkillBuilders
     .custom()
     .addRequestHandlers(StateHandler)

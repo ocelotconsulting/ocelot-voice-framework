@@ -1,7 +1,7 @@
 
 
 const skillIdInterceptor = {
-  process: async handlerInput => {
+  process: handlerInput => {
     const {
       requestEnvelope: {
         context:{
@@ -16,7 +16,6 @@ const skillIdInterceptor = {
 
     if ( applicationId !== process.env.SKILL_ID ) throw "This should never happen. Incorrect skill."
   }
-
 }
 
 module.exports = {

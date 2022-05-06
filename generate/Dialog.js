@@ -32,14 +32,18 @@ module.exports = class Dialog {
     return this;
   }
 
-  getText(key, params = {}) {
+  getText(key, params = {}, errorOnMissingKey = true) {
     const value = this.i18n.t(key, { ...params, returnObjects: true });
     // i18next returns the key if the value isn't available in the locale, or
     // fallback translation.
     // TODO: Discuss how to verify that each function will return a valid dialog text
 
     if (value === key) {
-      throw new Error('No translation key available for key [' + key + '].');
+      if (errorOnMissingKey) {
+        throw new Error('No translation key available for key [' + key + '].');
+      }
+
+      return ''
     }
 
     if (Array.isArray(value)) {

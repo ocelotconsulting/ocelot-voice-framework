@@ -9,7 +9,6 @@ module.exports = translations => ({
         translation: { ...translations, home: generateHomeDialog(translations.home) },
       },
     })
-    console.log('allTranslations', JSON.stringify(allTranslations))
     const dialog = new Dialog(handlerInput.requestEnvelope.request.locale, allTranslations)
     const requestAttributes = handlerInput.attributesManager.getRequestAttributes()
 
